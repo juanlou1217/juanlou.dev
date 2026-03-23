@@ -4,11 +4,11 @@ set -e
 echo "🔧 Step 1: Running Prisma migrations..."
 # Prisma 7 需要通过环境变量传递数据库 URL
 if [ -z "$POSTGRES_URL" ]; then
-  echo "❌ Error: POSTGRES_URL environment variable is not set"
-  exit 1
+  echo "⚠️  Warning: POSTGRES_URL environment variable is not set"
+  echo "⚠️  Skipping database migrations (will use existing schema)"
+else
+  prisma migrate deploy
 fi
-
-prisma migrate deploy
 
 echo "🔧 Step 2: Generating Prisma Client..."
 prisma generate

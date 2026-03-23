@@ -35,10 +35,9 @@ const TableOfContents = (props: TableOfContentsProps) => {
       threshold: 0.1,
     });
 
-    console.log(toc);
-
     toc.forEach(({ url }) => {
-      const element = document.querySelector(url);
+      const id = url.startsWith('#') ? url.slice(1) : url;
+      const element = document.getElementById(id);
 
       if (element) {
         observer.observe(element);
@@ -47,7 +46,8 @@ const TableOfContents = (props: TableOfContentsProps) => {
 
     return () => {
       toc.forEach(({ url }) => {
-        const element = document.querySelector(url);
+        const id = url.startsWith('#') ? url.slice(1) : url;
+        const element = document.getElementById(id);
 
         if (element) {
           observer.unobserve(element);

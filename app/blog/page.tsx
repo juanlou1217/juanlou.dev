@@ -5,9 +5,10 @@ import { genPageMetadata } from '@/lib/seo';
 
 const POSTS_PER_PAGE = 5;
 
-export const metadata = genPageMetadata({ title: 'Blog' });
+export const metadata = genPageMetadata({ title: '博客' });
 
 export default function BlogPage() {
+  // 显示所有文章（不过滤分类）
   const posts = allCoreContent(sortPosts(allBlogs));
   const pageNumber = 1;
   const initialDisplayPosts = posts.slice(POSTS_PER_PAGE * (pageNumber - 1), POSTS_PER_PAGE * pageNumber);
@@ -17,6 +18,6 @@ export default function BlogPage() {
   };
 
   return (
-    <ListLayout posts={posts} initialDisplayPosts={initialDisplayPosts} pagination={pagination} title="All Posts" />
+    <ListLayout posts={posts} initialDisplayPosts={initialDisplayPosts} pagination={pagination} title="所有文章" />
   );
 }

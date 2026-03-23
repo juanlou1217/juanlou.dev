@@ -2,44 +2,22 @@ import type { Project } from '@/types/data';
 
 const projectsData: Project[] = [
   {
-    type: 'work',
-    title: 'EcomHeat - Manage Market Share, Monitor Sales Performance, Optimize Store Operation',
-    description:
-      'The pioneering E-commerce data intelligence platform in Vietnam for brands with the most granular data information.',
-    imgSrc: '/static/images/projects/ecom-heat.png',
-    url: 'https://youneteci.com/en/eci-ecomheat/?ref=karhdo.dev',
-    builtWith: ['React', 'Bootstrap', 'FeathersJS', 'MySQL', 'RabbitMQ'],
-  },
-  {
-    type: 'work',
-    title: 'Military 7A Bidding',
-    description:
-      'Creating a web-based system designed for the efficient management of bidding packages related to medical supplies information.',
-    imgSrc: '/static/images/projects/military-7a-bidding.png',
-    builtWith: ['NestJS', 'PosgreSQL', 'JWT', 'VueJS', 'Tailwind'],
-  },
-  {
     type: 'self',
-    title: 'Personal website',
+    title: '个人博客网站',
+    description: '一个记录技术学习和生活思考的地方',
     imgSrc: '/static/images/projects/karhdo-blog.png',
-    repo: 'Karhdo/karhdo.dev',
-    builtWith: ['Next.js', 'Tailwind', 'Typescript', 'Prisma', 'Umami'],
+    repo: 'juanlou1217/juanlou.dev',
+    builtWith: ['Next.js', 'Tailwind', 'Typescript', 'Prisma', 'PostgreSQL'],
   },
-  {
-    type: 'self',
-    title: 'Website Selling Food',
-    imgSrc: '/static/images/projects/website-selling-food.png',
-    repo: 'Karhdo/Website-Selling-Food',
-    builtWith: ['PHP', 'Laravel', 'MySQL', 'VueJS', 'Bootstrap'],
-  },
-  {
-    type: 'self',
-    title: 'Simulate Basic Geometry',
-    description: 'Explore the World of Basic 3D Modeling Simulations on Our Website.',
-    imgSrc: '/static/images/projects/simulate-geometry.png',
-    repo: 'Karhdo/geometry-simulation',
-    builtWith: ['Javascript', 'Jquery', 'ThreeJS'],
-  },
+  // 在这里添加你自己的项目
+  // {
+  //   type: 'self',
+  //   title: '项目名称',
+  //   description: '项目描述',
+  //   imgSrc: '/static/images/projects/your-project.png',
+  //   repo: 'juanlou1217/your-repo',
+  //   builtWith: ['技术栈1', '技术栈2'],
+  // },
 ];
 
 export default projectsData;

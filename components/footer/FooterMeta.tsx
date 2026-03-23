@@ -10,17 +10,17 @@ import Twemoji from '@/components/ui/Twemoji';
 import type { GithubRepository } from '@/types/index';
 import { fetcher } from '@/lib/utils';
 
-const TIME_IS = 'https://time.is/Hanoi';
-const MY_TIMEZONE = 'Asia/Ho_Chi_Minh';
-const MY_TIMEZONE_OFFSET = 7 * -60; // UTC+7
+const TIME_IS = 'https://time.is/Hangzhou';
+const MY_TIMEZONE = 'Asia/Shanghai';
+const MY_TIMEZONE_OFFSET = 8 * -60; // UTC+8
 
 function getTime() {
   const date = new Date();
   const visitorTimezoneOffset = date.getTimezoneOffset();
   const hoursDiff = (visitorTimezoneOffset - MY_TIMEZONE_OFFSET) / 60;
-  const diff = hoursDiff === 0 ? 'same time' : hoursDiff > 0 ? `${hoursDiff}h ahead` : `${hoursDiff * -1}h behind`;
+  const diff = hoursDiff === 0 ? '相同时间' : hoursDiff > 0 ? `快 ${hoursDiff} 小时` : `慢 ${hoursDiff * -1} 小时`;
 
-  const time = new Intl.DateTimeFormat('en-US', {
+  const time = new Intl.DateTimeFormat('zh-CN', {
     timeZone: MY_TIMEZONE,
     hour: '2-digit',
     minute: '2-digit',
@@ -54,7 +54,7 @@ const FooterMeta: React.FC = () => {
       <div className="flex items-center gap-2">
         <MapPin className="h-5 w-5" />
         <span className="font-medium">
-          Ho Chi Minh, Viet Nam <Twemoji emoji="flag-vietnam" className="h-4.5!" />
+          中国杭州 <Twemoji emoji="flag-china" className="h-4.5!" />
         </span>
       </div>
       <div className="flex items-center gap-2">

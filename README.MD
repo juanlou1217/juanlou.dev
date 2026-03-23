@@ -1,21 +1,21 @@
-<h1 align="center">Karhdo 的编程之旅</h1>
-<p align="center"><i>我对实践技能和分享知识的渴望推动着我的努力。</i></p>
+<h1 align="center">卷娄的折腾日记</h1>
+<p align="center"><i>知其卷娄之患，故守其不卷不娄之身</i></p>
 
 <div align="center">
-    <a href="https://github.com/Karhdo/karhdo.dev/stargazers"><img src="https://img.shields.io/github/stars/Karhdo/karhdo.dev" alt="Stars Badge"/></a>
-    <a href="https://github.com/Karhdo/karhdo.dev/network/members"><img src="https://img.shields.io/github/forks/Karhdo/karhdo.dev" alt="Forks Badge"/></a>
-    <a href="https://github.com/Karhdo/karhdo.dev/pulls"><img src="https://img.shields.io/github/issues-pr/Karhdo/karhdo.dev" alt="Pull Requests Badge"/></a>
-    <a href="https://github.com/Karhdo/karhdo.dev/issues"><img src="https://img.shields.io/github/issues/Karhdo/karhdo.dev" alt="Issues Badge"/></a>
-    <a href="https://github.com/Karhdo/karhdo.dev/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/Karhdo/karhdo.dev?color=2b9348"></a>
-    <a href="https://github.com/Karhdo/karhdo.dev/blob/master/LICENSE"><img src="https://img.shields.io/github/license/Karhdo/karhdo.dev?color=2b9348" alt="License Badge"/></a>
+    <a href="https://github.com/juanlou1217/juanlou.dev/stargazers"><img src="https://img.shields.io/github/stars/juanlou1217/juanlou.dev" alt="Stars Badge"/></a>
+    <a href="https://github.com/juanlou1217/juanlou.dev/network/members"><img src="https://img.shields.io/github/forks/juanlou1217/juanlou.dev" alt="Forks Badge"/></a>
+    <a href="https://github.com/juanlou1217/juanlou.dev/pulls"><img src="https://img.shields.io/github/issues-pr/juanlou1217/juanlou.dev" alt="Pull Requests Badge"/></a>
+    <a href="https://github.com/juanlou1217/juanlou.dev/issues"><img src="https://img.shields.io/github/issues/juanlou1217/juanlou.dev" alt="Issues Badge"/></a>
+    <a href="https://github.com/juanlou1217/juanlou.dev/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/juanlou1217/juanlou.dev?color=2b9348"></a>
+    <a href="https://github.com/juanlou1217/juanlou.dev/blob/master/LICENSE"><img src="https://img.shields.io/github/license/juanlou1217/juanlou.dev?color=2b9348" alt="License Badge"/></a>
 </div>
 <br>
-<p align="center"><i>喜欢这个项目？请访问我们的<a href="https://karhdo-blog.vercel.app">网站</a></i></p>
+<p align="center"><i>一位迷茫的折腾日记，分享代码，也写生活</i></p>
 <br>
 
 ## 网站
 
-<a href="https://karhdo-blog.vercel.app"><img src="https://raw.githubusercontent.com/Karhdo/karhdo.dev/main/public/static/images/projects/karhdo-blog.png" alt="Image Karhdo's Blog Website" /></a>
+访问 [juanlou.top](https://juanlou.top) 查看博客
 
 ## 技术栈
 
@@ -78,7 +78,7 @@ docker compose exec app pnpm prisma:migrate:deploy
 
 ---
 
-<p align="center"><b>版权所有 © 2026 - Do Trong Khanh (Karhdo)</b></p>
+<p align="center"><b>版权所有 © 2026 - 赵康（卷娄）</b></p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

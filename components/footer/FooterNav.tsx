@@ -30,7 +30,7 @@ const FooterNav: React.FC = () => {
     <div className="flex flex-col gap-4 px-1 md:flex-row md:justify-end md:gap-24 md:px-0 md:text-right">
       <div className="space-y-1 md:space-y-4">
         <div className="flex h-11 items-center font-semibold md:justify-end">
-          <span>Sitemap</span>
+          <span>网站地图</span>
         </div>
         <ul className="flex flex-wrap gap-4 md:flex-col md:gap-3">
           {FOOTER_NAV_LINKS.map((link, idx) => (
@@ -45,7 +45,7 @@ const FooterNav: React.FC = () => {
       </div>
       <div className="space-y-1 md:space-y-4">
         <div className="flex h-11 items-center font-semibold">
-          <span>Personal stuff</span>
+          <span>个人信息</span>
         </div>
         <ul className="flex flex-wrap gap-4 md:flex-col md:gap-3">
           {FOOTER_PERSONAL_STUFF.map((link, idx) => (

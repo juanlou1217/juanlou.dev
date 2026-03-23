@@ -1,6 +1,6 @@
 {
-  "name": "karhdo.dev",
-  "version": "3.0.0",
+  "name": "juanlou.dev",
+  "version": "1.0.0",
   "engines": {
     "node": "24.x"
   },
@@ -10,9 +10,10 @@
     "start": "next dev",
     "dev": "NODE_OPTIONS='--no-deprecation' contentlayer2 build && cross-env INIT_CWD=$PWD next dev",
     "build": "NODE_OPTIONS='--no-deprecation' contentlayer2 build && next build",
+    "vercel-build": "prisma migrate deploy && prisma generate && NODE_OPTIONS='--no-deprecation' contentlayer2 build && next build",
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
-    "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
+    "lint": "eslint --fix",
     "prisma:generate": "prisma generate && node scripts/postgenerate.mjs",
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "dotenv -e .env.local -- prisma migrate deploy",

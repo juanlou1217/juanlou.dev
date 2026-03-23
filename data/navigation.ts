@@ -1,22 +1,22 @@
-import SITE_METADATA from '@/data/siteMetadata';
-
 export const HEADER_NAV_LINKS = [
-  { href: '/blog', title: 'Blog' },
-  // { href: '/tags', title: 'Tags' },
-  { href: '/projects', title: 'Projects' },
-  { href: '/about', title: 'About' },
-  // { href: '/resume', title: 'Resume' },
+  { href: '/', title: '首页' },
+  { href: '/blog/tech', title: '技术分享' },
+  { href: '/blog/life', title: '生活感悟' },
+  { href: '/blog/essay', title: '随笔' },
+  { href: '/lab', title: '实验室' },
+  { href: '/about', title: '关于' },
 ];
 
 export const FOOTER_NAV_LINKS = [
-  { href: '/blog', title: 'Blog' },
-  { href: '/projects', title: 'Projects' },
-  { href: '/tags', title: 'Tags' },
-  { href: '/feed.xml', title: 'RSS Feed' },
+  { href: '/blog/tech', title: '技术分享' },
+  { href: '/lab', title: '实验室' },
+  { href: '/tags', title: '标签' },
+  { href: '/feed.xml', title: 'RSS 订阅' },
 ];
 
 export const FOOTER_PERSONAL_STUFF = [
-  { href: '/about', title: 'About' },
-  { href: '/static/resume.pdf', title: 'Resume' },
-  { href: SITE_METADATA.analyticsURL, title: 'Analytics' },
+  { href: '/about', title: '关于我' },
+  { href: '/blog/life', title: '生活感悟' },
+  { href: '/blog/essay', title: '随笔' },
+  { href: '/static/resume.pdf', title: '简历' },
 ];

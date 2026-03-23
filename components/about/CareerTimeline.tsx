@@ -2,122 +2,49 @@ import TimelineItem from './TimelineItem';
 
 export const EXPERIENCES = [
   {
-    org: 'Spartan',
-    url: 'https://hirespartan.io/',
-    logo: '/static/images/experiences/spartan-logo.jpeg',
-    start: 'Mar 2025',
-    end: 'Present',
-    title: 'Software Engineer',
+    org: 'JobRight',
+    url: 'https://jobright.ai',
+    logo: '/static/images/experiences/jobright.svg',
+    start: '2026年3月',
+    end: '至今',
+    title: '前端开发实习生',
     icon: 'man-technologist',
-    event: 'career-spartan',
+    event: 'career-jobright',
     details: () => {
       return (
         <ul className="[&>li]:my-2 [&>li]:pl-0">
           <li>
-            <strong>
-              <a href="https://dealops.com/" target="_blank" rel="noopener noreferrer">
-                Dealops
-              </a>
-            </strong>{' '}
-            – SaaS platform that helps Sales and Revenue Ops teams manage deal pricing and quoting with AI. Built a
-            conversational chatbot UI using <strong>React, TypeScript, and TailwindCSS</strong>, integrating streaming
-            APIs from the backend to deliver a smooth and responsive user experience. Also implemented complex pricing
-            configuration and admin dashboards using <strong>React Hook Form</strong>, <strong>Ant Design</strong>, and
-            a <strong>Turborepo</strong>-based monorepo to streamline development and deployment.
+            <strong>硅谷 AI 求职平台</strong>，服务北美市场，为求职者提供智能化的职位匹配和简历优化服务。
           </li>
           <li>
-            <strong>
-              <a href="https://www.deepskyclimate.com/" target="_blank" rel="noopener noreferrer">
-                Deepsky
-              </a>
-            </strong>{' '}
-            – Data platform for processing CO₂ removal measurements and validating them into carbon credits that can be
-            traded on the global carbon market. Designed and implemented data pipelines following the{' '}
-            <strong>medallion architecture</strong>, leveraging{' '}
-            <strong>Apache Spark, Delta Lake, AWS S3, AWS EMR,</strong> and <strong>Databricks</strong> to optimize data
-            processing and analytics workflows.
+            开发 <strong>浏览器插件自动填充功能</strong>，使用 <strong>React、TypeScript</strong>{' '}
+            实现跨站点表单自动填充， 显著提升求职效率。
           </li>
         </ul>
       );
     },
   },
   {
-    org: 'Younet Media',
-    url: 'https://younetmedia.com',
-    logo: '/static/images/experiences/younetmedia-logo.png',
-    start: 'Mar 2022',
-    end: 'Mar 2025',
-    title: 'Junior Software Engineer',
+    org: '中国科学院软件研究所 · 旋武社区',
+    url: 'https://xuanwu.openatom.cn/',
+    logo: '/static/images/experiences/xuanwu.png',
+    start: '2025年9月',
+    end: '至今',
+    title: '前端开发实习生',
     icon: 'man-technologist',
-    event: 'career-younetmedia',
+    event: 'career-xuanwu',
     details: () => {
       return (
         <ul className="[&>li]:my-2 [&>li]:pl-0">
           <li>
-            Built{' '}
-            <a href="https://ecomheat.youneteci.com" rel="noopener noreferrer" target="_blank">
-              Ecomheat
-            </a>{' '}
-            – a web platform that measures industry and brand performance across major E-commerce channels, providing
-            analytics and insights for marketing and business teams.
+            参与 <strong>Mega 代码托管平台</strong>客户端开发，基于 <strong>Rust + Next.js</strong>{' '}
+            构建的现代化代码托管解决方案。
           </li>
           <li>
-            Developed <strong>AppCore</strong> – a set of reusable <strong>NestJS</strong> core packages (including{' '}
-            <strong>DatabaseModule, CacheModule, RedisModule, ConfigModule</strong>, and others) and published them to
-            npm to accelerate development and deployment across multiple internal projects.
+            负责 <strong>Moon 项目</strong>日常开发，使用 <strong>React、TypeScript、Next.js</strong>{' '}
+            实现代码审查、分支管理等核心功能。
           </li>
-        </ul>
-      );
-    },
-  },
-  {
-    org: 'QKIT Software',
-    url: 'https://qkit.vn',
-    logo: '/static/images/experiences/qkit-logo.png',
-    start: 'Jan 2021',
-    end: 'Dec 2022',
-    title: 'Fresher Backend Developer',
-    icon: 'man-technologist',
-    event: 'career-qkit',
-    details: () => {
-      return (
-        <ul className="[&>li]:my-2 [&>li]:pl-0">
-          <li>
-            <strong>Developed and maintained web applications</strong> used to manage company website content, including
-            blogs, client portfolios, and recruitment pages.
-          </li>
-          <li>
-            Implemented backend services using <strong>NestJS, PostgreSQL, and Prisma</strong>, focusing on clean
-            architecture, performance, and maintainability.
-          </li>
-          <li>
-            <strong>Participated in Agile/Scrum workflows</strong>, collaborating closely with designers and senior
-            engineers to improve delivery speed and overall project quality.
-          </li>
-        </ul>
-      );
-    },
-  },
-  {
-    org: 'University of Information Technology',
-    url: 'https://en.uit.edu.vn',
-    logo: '/static/images/experiences/uit-logo.png',
-    start: 'Aug 2019',
-    end: 'Jun 2023',
-    title: 'Student at UIT – HCMC (School of Computer Science)',
-    icon: 'student',
-    event: 'career-uit',
-    details: () => {
-      return (
-        <ul className="[&>li]:my-2 [&>li]:pl-0">
-          <li>
-            Graduated with a good academic standing at the <strong>School of Computer Science</strong>.
-          </li>
-          <li>
-            While many of my peers pursued careers in <strong>Data</strong> or <strong>AI Engineering</strong>, I found
-            my passion in <strong>Software Engineering</strong>, especially in web and application development – a
-            decision that has strongly shaped my current career path.
-          </li>
+          <li>参与旋武开源社区网站维护，进行项目优化和技术迁移。</li>
         </ul>
       );
     },

@@ -12,17 +12,17 @@ import Logo from 'public/static/images/logo.svg';
 
 import MobileNav from './MobileNav';
 import ThemeSwitch from './ThemeSwitch';
-// import SearchButton from './SearchButton';
+import SearchButton from './SearchButton';
 import AnalyticsLink from './AnalyticsLink';
 
 const Header = () => {
   const pathname = usePathname();
 
   let headerClass =
-    'mx-auto w-full max-w-6xl supports-backdrop-blur fixed left-0 right-0 top-1 z-10 bg-white/75 py-2 backdrop-blur-sm dark:bg-dark/75 md:rounded-2xl';
+    'mx-auto w-full max-w-6xl supports-backdrop-blur fixed left-0 right-0 top-1 z-50 bg-white/75 py-2 backdrop-blur-sm dark:bg-dark/75 md:rounded-2xl';
 
   if (siteMetadata.stickyNav) {
-    headerClass += ' sticky top-0 z-50';
+    headerClass += ' sticky top-0';
   }
 
   return (
@@ -33,7 +33,7 @@ const Header = () => {
             <Logo className="fill-dark dark:fill-white" />
           </div>
           <div className="group ml-2 text-xl font-bold transition duration-300">
-            Karhdo.dev
+            卷娄的折腾日记
             <span className="block h-0.5 max-w-0 bg-black transition-all duration-500 group-hover:max-w-[85%] dark:bg-white"></span>
           </div>
         </Link>
@@ -60,9 +60,9 @@ const Header = () => {
             className="hidden h-4 w-px shrink-0 bg-gray-200 md:block dark:bg-gray-600"
           />
           <div className="flex items-center">
-            <AnalyticsLink />
+            {/* <AnalyticsLink /> */}
+            <SearchButton />
             <ThemeSwitch />
-            {/* <SearchButton /> */}
             <MobileNav />
           </div>
         </div>

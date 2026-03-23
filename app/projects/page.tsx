@@ -4,7 +4,7 @@ import projectsData from '@/data/projectsData';
 import { fetchRepoData } from '@/lib/services/github';
 import ProjectCard from '@/components/project/ProjectCard';
 
-export const metadata = genPageMetadata({ title: 'Projects' });
+export const metadata = genPageMetadata({ title: '项目' });
 
 export default async function Projects() {
   // Create new array instead of mutating imported data (server-dedup-props)
@@ -22,7 +22,7 @@ export default async function Projects() {
     })
   );
 
-  const description = 'My open-source side projects and stuff that I built with my colleagues at work';
+  const description = '我的开源项目和与同事一起构建的作品';
 
   // Combine filter operations for better performance (js-combine-iterations)
   const workProjects: typeof projects = [];
@@ -41,14 +41,14 @@ export default async function Projects() {
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="space-y-2 pt-6 pb-8 md:space-y-5">
           <h1 className="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14 dark:text-gray-100">
-            Projects
+            项目
           </h1>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">{description}</p>
         </div>
 
         <div className="container py-12">
           <h3 className="mb-4 text-3xl leading-9 font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
-            Work
+            工作项目
           </h3>
           <div className="-m-4 flex flex-wrap">
             {workProjects.map((project) => (
@@ -59,7 +59,7 @@ export default async function Projects() {
 
         <div className="container py-12">
           <h3 className="mb-4 text-3xl leading-9 font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
-            Side projects
+            个人项目
           </h3>
           <div className="-m-4 flex flex-wrap">
             {sideProjects.map((project) => (

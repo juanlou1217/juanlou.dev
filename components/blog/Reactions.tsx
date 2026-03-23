@@ -51,7 +51,8 @@ function getStoredReactions(storageKey: string): ReactionState {
   if (typeof window === 'undefined') return DEFAULT_REACTIONS;
   try {
     const stored = localStorage.getItem(storageKey);
-    const data: ReactionState = stored ? JSON.parse(stored) : DEFAULT_REACTIONS;
+    if (!stored) return DEFAULT_REACTIONS;
+    const data: ReactionState = JSON.parse(stored);
     return {
       loves: data.loves || 0,
       ideas: data.ideas || 0,
@@ -176,7 +177,7 @@ const Reactions = (props: ReactionsProps) => {
   }, []);
 
   return (
-    <div className={clsx('flex items-center gap-6', className)}>
+    <div className={clsx('flex items-center gap-6', className)} suppressHydrationWarning>
       {REACTIONS.map(({ key, emoji }) => {
         const typedStats = stats as Stats;
         const displayValue = isLoading ? '--' : typedStats[key] + state.reactions[key] - state.initial[key];

@@ -1,16 +1,21 @@
 import clsx from 'clsx';
+import Twemoji from '@/components/ui/Twemoji';
+import MusicBar from '@/components/homepage/MusicBar';
 
-const Greeting = () => {
-  const className = clsx(
-    'bg-gradient-to-r from-gray-500 to-slate-400 dark:bg-gradient-to-l dark:from-blue-800 dark:to-primary-600',
-    'mb-8 bg-clip-text text-4xl font-extrabold leading-[60px] tracking-tight text-transparent md:text-7xl md:leading-[86px]'
-  );
-
+function Greeting() {
   return (
-    <div className={className}>
-      Hello, folks! <span className="font-bold">Discover my stories and creative ideas.</span>
+    <div
+      className={clsx(
+        'font-greeting font-extrabold tracking-tight',
+        'text-[40px] leading-[60px] md:text-[68px] md:leading-[100px]',
+        'bg-clip-text text-transparent',
+        'bg-linear-to-l from-yellow-500 to-green-600',
+        'dark:bg-linear-to-l dark:from-emerald-500 dark:to-lime-600'
+      )}
+    >
+      Howdy, fellow! <Twemoji emoji="waving-hand" size="base" />
     </div>
   );
-};
+}
 
 export default Greeting;

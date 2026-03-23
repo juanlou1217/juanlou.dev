@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Image from '@/components/ui/Image';
 import ProfileInfo from '@/components/homepage/ProfileInfo';
@@ -52,7 +52,7 @@ const ProfileCard = () => {
 
   return (
     <div
-      className="z-10 scale-100 transition-all duration-200 ease-out hover:z-50 hover:scale-[1.11]"
+      className="z-10 hidden scale-100 transition-all duration-200 ease-out hover:z-40 hover:scale-[1.11] xl:block"
       style={{ perspective: '600px' }}
       ref={ref}
     >
@@ -60,19 +60,11 @@ const ProfileCard = () => {
         style={style}
         className="overflow-hidden rounded-sm shadow-lg shadow-slate-300 transition-all duration-200 ease-out dark:shadow-sky-700/50"
       >
-        <Image
-          src={'/static/images/avatar.jpg'}
-          alt="avatar"
-          width={550}
-          height={350}
-          style={{
-            objectPosition: '50% 0%',
-            objectFit: 'cover',
-            width: '100%',
-            aspectRatio: '20/16',
-          }}
-        />
-        <SpotifyNowPlaying />
+        <div style={style} className="max-h-[430px] overflow-hidden rounded-md transition-all duration-200 ease-out">
+          <Image src={'/static/images/avatar_backup.jpg'} alt="avatar" width={430} height={430} />
+        </div>
+
+        {/*<SpotifyNowPlaying />*/}
         <ProfileInfo />
         <div className="h-1.5 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></div>
       </div>

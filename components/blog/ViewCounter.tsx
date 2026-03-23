@@ -17,7 +17,11 @@ const ViewCounter = ({ type, slug, className }: ViewCounterProps) => {
     }
   }, [stats, isLoading]);
 
-  return <span className={className}>{stats['views'] > 0 ? stats['views'].toLocaleString() : '---'} views</span>;
+  return (
+    <span className={className} suppressHydrationWarning>
+      {stats['views'] > 0 ? stats['views'].toLocaleString() : '---'} views
+    </span>
+  );
 };
 
 export default ViewCounter;

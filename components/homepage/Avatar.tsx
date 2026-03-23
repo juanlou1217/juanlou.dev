@@ -1,8 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Image from '@/components/ui/Image';
+import SpotifyNowPlaying from '@/components/homepage/SpotifyNowPlaying';
+import { clsx } from 'clsx';
 
 const Avatar = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -57,7 +59,7 @@ const Avatar = () => {
       ref={ref}
     >
       <div style={style} className="max-h-[430px] overflow-hidden rounded-md transition-all duration-200 ease-out">
-        <Image src={'/static/images/avatar.jpg'} alt="avatar" width={430} height={430} />
+        <Image src={'/static/images/avatar_backup.jpg'} alt="avatar" width={430} height={430} />
       </div>
     </div>
   );

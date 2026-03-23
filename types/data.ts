@@ -42,3 +42,13 @@ export type GithubRepository = {
     url: string;
   };
 };
+
+export interface LabItem {
+  category: 'experiment' | 'demo' | 'tool';
+  title: string;
+  description: string;
+  imgSrc: string;
+  url: string;
+  status: 'completed' | 'in-progress' | 'planned';
+  tags: string[];
+}

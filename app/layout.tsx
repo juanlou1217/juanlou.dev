@@ -79,7 +79,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
-      <body className="dark:bg-dark bg-white pl-[calc(100vw-100%)] text-black antialiased dark:text-white">
+      <body
+        className="dark:bg-dark bg-white pl-[calc(100vw-100%)] text-black antialiased dark:text-white"
+        suppressHydrationWarning
+      >
         <TiltedGridBackground className="inset-x-0 top-0 z-[-1] h-[60vh]" />
 
         <ThemeProviders>

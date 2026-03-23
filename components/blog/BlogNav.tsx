@@ -16,7 +16,7 @@ const NavLabel = ({ label }: { label?: string }) => {
 };
 
 const PostNav = (props: BlogNavProps) => {
-  const { next, nextLabel = 'Next post', prev, prevLabel = 'Previous post' } = props;
+  const { next, nextLabel = '下一篇', prev, prevLabel = '上一篇' } = props;
 
   if (!prev && !next) {
     return null;

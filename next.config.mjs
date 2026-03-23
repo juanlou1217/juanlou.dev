@@ -80,6 +80,14 @@ const baseConfig = {
         protocol: 'https',
         hostname: 'i.scdn.co', // Spotify album covers
       },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co', // Placeholder images
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com', // Alternative placeholder service
+      },
     ],
     qualities: [100, 75],
     unoptimized,

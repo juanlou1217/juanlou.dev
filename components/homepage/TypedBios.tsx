@@ -24,40 +24,27 @@ const TypedBios = () => {
   return (
     <div>
       <ul id="bios" className="hidden">
+        <li>从老家来到杭州闯一闯。</li>
+        <li>不甘让生活成为一潭死水。</li>
+        <li>相信先做再看胜过完美想象。</li>
         <li>
-          I'm aliased as <b className="font-medium">Karhdo</b> at work.
+          对 <b className="font-medium">AI</b> 和 <b className="font-medium">3D 交互</b>很感兴趣。
         </li>
         <li>
-          I live in <b className="font-medium">Ho Chi Minh, Viet Nam</b>.
+          热爱 <b className="font-medium">样式开发</b>，也喜欢折腾新鲜玩意儿。
         </li>
         <li>
-          I was born in the beautiful <b className="font-medium">Quang Ngai</b> city.
+          喜欢打羽毛球 <Twemoji emoji="badminton" />
+          ，听音乐 <Twemoji emoji="musical-keyboard" />。
         </li>
         <li>
-          My first programming language I learned was <b className="font-medium">C++</b>.
+          玩游戏是我的放松方式 <Twemoji emoji="video-game" />
+          （鹅鸭杀玩家在此）。
         </li>
-        <li>I love web development.</li>
+        <li>正在参与开源项目打磨能力。</li>
+        <li>一直在折腾，一直在成长。</li>
         <li>
-          I'm focusing on building <b className="font-medium">Dealops Project - SaasS platform</b>.
-        </li>
-        <li>
-          I work mostly with <b className="font-medium">Javascript/Typescript</b> technologies.
-        </li>
-        <li>
-          I'm a dog-person <Twemoji emoji="dog" />.
-        </li>
-        <li>
-          I'm a sporty-guy. I love
-          <span className="ml-1">
-            <Twemoji emoji="tennis" />, <Twemoji emoji="soccer-ball" />
-          </span>
-          .
-        </li>
-        <li>
-          I love listening <Twemoji emoji="musical-keyboard" /> and rap music.
-        </li>
-        <li>
-          I love playing video game <Twemoji emoji="video-game" />, LoL is my favorite one.
+          远方不远，一步步走 <Twemoji emoji="airplane" />。
         </li>
       </ul>
       <span ref={el} className="text-neutral-900 dark:text-neutral-200" />

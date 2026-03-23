@@ -9,25 +9,3 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-
-////////////////////////////////////////
-// Models
-////////////////////////////////////////
-
-enum StatsType {
-  blog
-  snippet
-}
-
-model Stats {
-  type      StatsType @default(blog)
-  slug      String    @db.VarChar(255)
-  views     Int       @default(0)
-  loves     Int       @default(0)
-  applauses Int       @default(0)
-  ideas     Int       @default(0)
-  bullseye  Int       @default(0)
-
-  @@id([type, slug])
-  @@map("stats")
-}

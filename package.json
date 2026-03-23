@@ -10,7 +10,7 @@
     "start": "next dev",
     "dev": "NODE_OPTIONS='--no-deprecation' contentlayer2 build && cross-env INIT_CWD=$PWD next dev",
     "build": "NODE_OPTIONS='--no-deprecation' contentlayer2 build && next build",
-    "vercel-build": "prisma migrate deploy && prisma generate && NODE_OPTIONS='--no-deprecation' contentlayer2 build && next build",
+    "vercel-build": "bash build.sh",
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
     "lint": "eslint --fix",
@@ -18,7 +18,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "dotenv -e .env.local -- prisma migrate deploy",
     "postgenerate": "node scripts/postgenerate.mjs",
-    "postinstall": "pnpm prisma:generate"
+    "postinstall": "prisma generate && node scripts/postgenerate.mjs"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

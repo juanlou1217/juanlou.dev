@@ -1,5 +1,6 @@
 services:
   app:
+    image: localhost/juanlou-dev_app:latest
     build:
       context: .
       dockerfile: Dockerfile

@@ -1,0 +1,94 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DEPLOY_HOST: ${{ secrets.PROD_HOST }}
+      DEPLOY_USER: ${{ secrets.PROD_USER }}
+      DEPLOY_PATH: ${{ secrets.PROD_PATH }}
+      SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+      GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
+      NEXT_PUBLIC_GISCUS_REPO: ${{ secrets.NEXT_PUBLIC_GISCUS_REPO }}
+      NEXT_PUBLIC_GISCUS_REPOSITORY_ID: ${{ secrets.NEXT_PUBLIC_GISCUS_REPOSITORY_ID }}
+      NEXT_PUBLIC_GISCUS_CATEGORY: ${{ secrets.NEXT_PUBLIC_GISCUS_CATEGORY }}
+      NEXT_PUBLIC_GISCUS_CATEGORY_ID: ${{ secrets.NEXT_PUBLIC_GISCUS_CATEGORY_ID }}
+      UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
+      UMAMI_SHARE_URL: ${{ secrets.UMAMI_SHARE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        run: |
+          test -n "$DEPLOY_HOST" || (echo "Missing PROD_HOST secret" && exit 1)
+          test -n "$DEPLOY_USER" || (echo "Missing PROD_USER secret" && exit 1)
+          test -n "${{ secrets.PROD_SSH_KEY }}" || (echo "Missing PROD_SSH_KEY secret" && exit 1)
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
+          SITE_DOMAIN="${SITE_DOMAIN:-juanlou.top}"
+          POSTGRES_USER="${POSTGRES_USER:-postgres}"
+          POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
+          POSTGRES_DB="${POSTGRES_DB:-juanlou_blog}"
+          POSTGRES_URL="${POSTGRES_URL:-postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB}"
+
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            export DEBIAN_FRONTEND=noninteractive
+            if ! command -v git >/dev/null 2>&1; then
+              apt-get update && apt-get install -y git
+            fi
+            mkdir -p '$DEPLOY_PATH'
+            if [ ! -d '$DEPLOY_PATH/.git' ]; then
+              git clone --depth 1 'https://github.com/${{ github.repository }}.git' '$DEPLOY_PATH'
+            fi
+            cd '$DEPLOY_PATH'
+            git fetch origin main
+            git checkout main
+            git reset --hard origin/main
+          "
+
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "cat > '$DEPLOY_PATH/.env.production'" <<EOF
+          SITE_DOMAIN=$SITE_DOMAIN
+          POSTGRES_USER=$POSTGRES_USER
+          POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+          POSTGRES_DB=$POSTGRES_DB
+          POSTGRES_URL=$POSTGRES_URL
+          GITHUB_API_TOKEN=$GITHUB_API_TOKEN
+          NEXT_PUBLIC_GISCUS_REPO=$NEXT_PUBLIC_GISCUS_REPO
+          NEXT_PUBLIC_GISCUS_REPOSITORY_ID=$NEXT_PUBLIC_GISCUS_REPOSITORY_ID
+          NEXT_PUBLIC_GISCUS_CATEGORY=$NEXT_PUBLIC_GISCUS_CATEGORY
+          NEXT_PUBLIC_GISCUS_CATEGORY_ID=$NEXT_PUBLIC_GISCUS_CATEGORY_ID
+          UMAMI_WEBSITE_ID=$UMAMI_WEBSITE_ID
+          UMAMI_SHARE_URL=$UMAMI_SHARE_URL
+          EOF
+
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            export APP_DIR='$DEPLOY_PATH'
+            cd '$DEPLOY_PATH'
+            bash scripts/deploy/remote-bootstrap.sh
+          "

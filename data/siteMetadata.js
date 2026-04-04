@@ -1,3 +1,10 @@
+const hasGiscusConfig = Boolean(
+  process.env.NEXT_PUBLIC_GISCUS_REPO &&
+    process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID &&
+    process.env.NEXT_PUBLIC_GISCUS_CATEGORY &&
+    process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID
+);
+
 const siteMetadata = {
   title: '卷娄的小屋',
   author: '卷娄',
@@ -27,23 +34,25 @@ const siteMetadata = {
       shareUrl: process.env.UMAMI_SHARE_URL,
     },
   },
-  comments: {
-    provider: 'giscus',
-    giscusConfig: {
-      repo: process.env.NEXT_PUBLIC_GISCUS_REPO,
-      repositoryId: process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID,
-      category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY,
-      categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,
-      mapping: 'pathname',
-      reactions: '1',
-      metadata: '0',
-      theme: 'light_protanopia',
-      darkTheme: 'transparent_dark',
-      themeURL: '',
-      lang: 'zh-CN',
-      inputPosition: 'bottom',
-    },
-  },
+  comments: hasGiscusConfig
+    ? {
+        provider: 'giscus',
+        giscusConfig: {
+          repo: process.env.NEXT_PUBLIC_GISCUS_REPO,
+          repositoryId: process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID,
+          category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY,
+          categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,
+          mapping: 'pathname',
+          reactions: '1',
+          metadata: '0',
+          theme: 'light_protanopia',
+          darkTheme: 'transparent_dark',
+          themeURL: '',
+          lang: 'zh-CN',
+          inputPosition: 'bottom',
+        },
+      }
+    : null,
   search: {
     provider: 'kbar',
     kbarConfig: {

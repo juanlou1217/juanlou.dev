@@ -4,6 +4,8 @@ set -euo pipefail
 APP_DIR="${APP_DIR:-/opt/juanlou-dev}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.prod.yml}"
 ENV_FILE="${ENV_FILE:-.env.production}"
+SWAPFILE_PATH="${SWAPFILE_PATH:-/swapfile}"
+SWAPFILE_SIZE="${SWAPFILE_SIZE:-4G}"
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -71,6 +73,28 @@ ensure_container_runtime() {
   exit 1
 }
 
+ensure_swap() {
+  if swapon --show | grep -q .; then
+    return
+  fi
+
+  if [ ! -f "$SWAPFILE_PATH" ]; then
+    if command -v fallocate >/dev/null 2>&1; then
+      fallocate -l "$SWAPFILE_SIZE" "$SWAPFILE_PATH"
+    else
+      dd if=/dev/zero of="$SWAPFILE_PATH" bs=1M count=4096
+    fi
+    chmod 600 "$SWAPFILE_PATH"
+    mkswap "$SWAPFILE_PATH"
+  fi
+
+  swapon "$SWAPFILE_PATH"
+
+  if ! grep -q "^$SWAPFILE_PATH " /etc/fstab 2>/dev/null; then
+    printf '%s none swap sw 0 0\n' "$SWAPFILE_PATH" >> /etc/fstab
+  fi
+}
+
 if ! command -v git >/dev/null 2>&1; then
   install_package git
 fi
@@ -80,6 +104,7 @@ if ! command -v curl >/dev/null 2>&1; then
 fi
 
 ensure_container_runtime
+ensure_swap
 
 if command -v systemctl >/dev/null 2>&1; then
   if systemctl list-unit-files | grep -q '^docker.service'; then

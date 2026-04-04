@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useBlogStats, useUpdateBlogStats } from 'hooks';
 
@@ -10,10 +10,16 @@ import type { ViewCounterProps } from '@/types/components';
 const ViewCounter = ({ type, slug, className }: ViewCounterProps) => {
   const [stats, isLoading] = useBlogStats(type, slug);
   const updateView = useUpdateBlogStats();
+  const viewedKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isLoading && stats) {
-      updateView({ type, slug, views: stats['views'] + 1 });
+    const currentKey = `${type}/${slug}`;
+
+    if (!isLoading && stats && viewedKeyRef.current !== currentKey) {
+      viewedKeyRef.current = currentKey;
+      void updateView({ type, slug, metric: 'views' }).catch(() => {
+        viewedKeyRef.current = null;
+      });
     }
   }, [stats, isLoading]);
 

@@ -1,45 +1,56 @@
 import type { NextRequest } from 'next/server';
 
-import type { Stats, StatsType } from '@/types/prisma';
+import type { Stats, StatsMetric, StatsType } from '@/types/prisma';
+import { STATS_METRICS, StatsTypeEnum } from '@/types/prisma';
 
 import prisma from '@/lib/services/prisma';
 
 const getBlogStats = async (slug: string, type: StatsType): Promise<Stats> => {
-  let result: Stats | null;
-
-  result = await prisma.stats.findUnique({
+  return prisma.stats.upsert({
     where: {
       type_slug: { slug, type },
     },
+    update: {},
+    create: { type, slug },
   });
-
-  if (!result) {
-    result = await prisma.stats.create({
-      data: { type, slug },
-    });
-  }
-
-  return result;
 };
 
-const updateBlogStats = async (type: StatsType, slug: string, updates: Partial<Stats>): Promise<Stats> => {
-  const currentStats = await getBlogStats(slug, type);
+const MAX_INCREMENT_BY_METRIC: Record<StatsMetric, number> = {
+  views: 1,
+  loves: 5,
+  applauses: 5,
+  ideas: 5,
+  bullseye: 5,
+};
 
-  // Safeguard against negative updates
-  for (const key in updates) {
-    if (typeof updates[key] === 'number' && updates[key] < currentStats[key]) {
-      updates[key] = currentStats[key];
-    }
-  }
+function isStatsMetric(metric: unknown): metric is StatsMetric {
+  return typeof metric === 'string' && STATS_METRICS.includes(metric as StatsMetric);
+}
 
-  const updated = await prisma.stats.update({
+function isStatsType(type: unknown): type is StatsType {
+  return typeof type === 'string' && Object.values(StatsTypeEnum).includes(type as StatsType);
+}
+
+function normalizeIncrement(metric: StatsMetric, count: unknown) {
+  const parsed = typeof count === 'number' ? count : 1;
+  const safeCount = Number.isFinite(parsed) ? Math.trunc(parsed) : 1;
+  return Math.min(Math.max(safeCount, 1), MAX_INCREMENT_BY_METRIC[metric]);
+}
+
+const updateBlogStats = async (type: StatsType, slug: string, metric: StatsMetric, count: number): Promise<Stats> => {
+  return prisma.stats.upsert({
     where: {
       type_slug: { slug, type },
     },
-    data: updates,
+    update: {
+      [metric]: { increment: count },
+    },
+    create: {
+      type,
+      slug,
+      [metric]: count,
+    },
   });
-
-  return updated;
 };
 
 export async function GET(request: NextRequest) {
@@ -47,9 +58,9 @@ export async function GET(request: NextRequest) {
     const { searchParams: params } = new URL(request.url);
 
     const slug = params.get('slug');
-    const type = params.get('type') as StatsType;
+    const type = params.get('type');
 
-    if (!slug || !type) {
+    if (!slug || !isStatsType(type)) {
       return new Response(JSON.stringify({ message: 'Missing or invalid `type` or `slug` parameter!' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -68,15 +79,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data: Stats = await request.json();
+    const data: unknown = await request.json();
 
-    const { slug, type, ...updates } = data;
+    const { slug, type, metric, count } =
+      typeof data === 'object' && data !== null ? (data as Record<string, unknown>) : {};
 
-    if (!slug || !type) {
-      return Response.json({ message: 'Missing `type` or `slug` parameter!' }, { status: 400 });
+    if (typeof slug !== 'string' || !slug || !isStatsType(type) || !isStatsMetric(metric)) {
+      return Response.json({ message: 'Missing or invalid `type`, `slug`, or `metric` parameter!' }, { status: 400 });
     }
 
-    const updated = await updateBlogStats(type, slug, updates);
+    const updated = await updateBlogStats(type, slug, metric, normalizeIncrement(metric, count));
 
     return Response.json(updated);
   } catch (error) {

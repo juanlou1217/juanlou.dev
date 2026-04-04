@@ -10,7 +10,6 @@ import Prisma from 'public/static/icons/prisma.svg';
 import Railway from 'public/static/icons/railway.svg';
 import React from 'public/static/icons/react.svg';
 import Remix from 'public/static/icons/remix.svg';
-import Spotify from 'public/static/icons/spotify.svg';
 import TailwindCSS from 'public/static/icons/tailwind.svg';
 import Typescript from 'public/static/icons/typescript.svg';
 import Umami from 'public/static/icons/umami.svg';
@@ -37,7 +36,6 @@ export const BrandIconsMap = {
   Umami,
   Vercel,
   Railway,
-  Spotify,
   NestJS,
   Docker,
   Postgres,

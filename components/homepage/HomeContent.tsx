@@ -12,7 +12,6 @@ import Heading from '@/components/homepage/Heading';
 import BlogLinks from '@/components/homepage/BlogLinks';
 import PopularTags from '@/components/homepage/PopularTags';
 import ShortDescription from '@/components/homepage/ShortDescription';
-import SpotifyNowPlaying from '@/components/homepage/SpotifyNowPlaying';
 import Greeting from '@/components/homepage/Greeting';
 import ProfileCard from '@/components/homepage/ProfileCard';
 
@@ -22,7 +21,7 @@ const TypedBios = dynamic(() => import('@/components/homepage/TypedBios'), { ssr
 
 const MAX_DISPLAY = 5;
 
-export function HomeContent({ posts }) {
+export function HomeContent({ posts, popularTags }) {
   return (
     <div className="relative">
       <Snowfall
@@ -57,7 +56,7 @@ export function HomeContent({ posts }) {
         </div>
       </div>
 
-      <PopularTags />
+      <PopularTags tags={popularTags} />
 
       {/* List all post */}
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -123,12 +122,6 @@ export function HomeContent({ posts }) {
           </Link>
         </div>
       )}
-
-      {/* {siteMetadata.newsletter.provider && (
-        <div className="flex items-center justify-center pt-4">
-          <NewsletterForm />
-        </div>
-      )} */}
     </div>
   );
 }

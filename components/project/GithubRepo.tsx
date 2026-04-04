@@ -5,14 +5,17 @@ import type { GithubRepository } from '@/types/data';
 
 export default function GithubRepo({ repo }: { repo: GithubRepository }) {
   const mainLanguage = find(repo.languages, (language) => language.name !== 'CSS');
+  const fallbackLanguage = mainLanguage ?? repo.languages[0];
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-1.5">
-          <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: mainLanguage.color }} />
-          <span>{mainLanguage.name}</span>
-        </div>
+        {fallbackLanguage && (
+          <div className="flex items-center space-x-1.5">
+            <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: fallbackLanguage.color }} />
+            <span>{fallbackLanguage.name}</span>
+          </div>
+        )}
         <div className="flex items-center space-x-1.5">
           <Star size={20} strokeWidth={1} />
           <span>{repo.stargazerCount}</span>

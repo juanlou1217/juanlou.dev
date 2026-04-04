@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-这是一个基于 **Next.js 16 + React 19 + TypeScript** 构建的个人博客系统，采用 App Router 架构，使用 Contentlayer 管理 MDX 内容，PostgreSQL 存储统计数据，集成 Spotify 和 GitHub API。
+这是一个基于 **Next.js 16 + React 19 + TypeScript** 构建的个人博客系统，采用 App Router 架构，使用 Contentlayer 管理 MDX 内容，PostgreSQL 存储统计数据，并集成 GitHub API。
 
 ## 技术栈
 
@@ -30,7 +30,6 @@ karhdo.dev/
 ├── public/                 # 静态资源
 ├── prisma/                 # 数据库 Schema 和迁移
 ├── providers/              # React Context Providers
-├── constants/              # 常量定义
 ├── css/                    # 全局样式
 ├── icons/                  # SVG 图标
 ├── scripts/                # 构建脚本
@@ -78,8 +77,6 @@ app/
 └── api/                    # API 路由
     ├── github/
     │   └── route.ts        # GET /api/github
-    ├── spotify/
-    │   └── route.ts        # GET /api/spotify
     ├── stats/
     │   └── route.ts        # GET/POST /api/stats
     └── newsletter/
@@ -124,7 +121,6 @@ components/
 │   ├── BuildWith.tsx       # 技术栈展示
 │   ├── LastCommit.tsx      # 最后提交信息
 │   ├── LogoAndRepo.tsx     # Logo 和仓库链接
-│   ├── Signature.tsx       # 签名
 │   └── index.tsx
 │
 ├── header/                 # 页头组件
@@ -147,8 +143,6 @@ components/
 │   ├── TypedBios.tsx       # 打字机效果简介
 │   ├── BlogLinks.tsx       # 博客链接
 │   ├── PopularTags.tsx     # 热门标签
-│   ├── SpotifyNowPlaying.tsx # Spotify 正在播放
-│   ├── MusicBar.tsx        # 音乐进度条
 │   └── index.ts
 │
 ├── project/                # 项目展示组件
@@ -218,20 +212,17 @@ hooks/
 ├── use-blog-stats.ts       # 博客统计 Hook
 │   ├── useBlogStats()      # 获取统计数据
 │   └── useUpdateBlogStats() # 更新统计数据
-├── use-now-playing.ts      # Spotify 正在播放 Hook
 ├── use-image-loaded-state.ts # 图片加载状态 Hook
 └── index.ts
 ```
 
 **使用示例**：
 ```typescript
-import { useBlogStats, useNowPlaying } from '@/hooks';
+import { useBlogStats } from '@/hooks';
 
 // 获取文章统计
 const [stats, isLoading] = useBlogStats('blog', 'my-post');
 
-// 获取 Spotify 播放状态
-const { isPlaying, title, artist } = useNowPlaying();
 ```
 
 ---
@@ -244,7 +235,6 @@ const { isPlaying, title, artist } = useNowPlaying();
 lib/
 ├── services/               # 外部服务集成
 │   ├── github.ts           # GitHub API 服务
-│   ├── spotify.ts          # Spotify API 服务
 │   └── prisma.ts           # Prisma 数据库客户端
 │
 ├── utils/                  # 工具函数
@@ -255,7 +245,6 @@ lib/
 
 **服务层说明**：
 - `github.ts`: 封装 GitHub GraphQL API 调用
-- `spotify.ts`: 封装 Spotify Web API 调用
 - `prisma.ts`: 导出 Prisma 客户端实例
 
 ---
@@ -523,22 +512,6 @@ API 路由 (app/api/stats/route.ts)
 Prisma 服务 (lib/services/prisma.ts)
     ↓
 PostgreSQL 数据库
-```
-
-### 3. Spotify 数据流程
-
-```
-客户端组件 (components/homepage/SpotifyNowPlaying.tsx)
-    ↓
-React Hook (hooks/use-now-playing.ts)
-    ↓
-SWR 缓存（30秒刷新）
-    ↓
-API 路由 (app/api/spotify/route.ts)
-    ↓
-Spotify 服务 (lib/services/spotify.ts)
-    ↓
-Spotify Web API
 ```
 
 ---

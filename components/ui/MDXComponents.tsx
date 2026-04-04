@@ -1,6 +1,5 @@
 import Pre from 'pliny/ui/Pre';
 import TOCInline from 'pliny/ui/TOCInline';
-import BlogNewsletterForm from 'pliny/ui/BlogNewsletterForm';
 import type { MDXComponents } from 'mdx/types';
 
 import Link from '@/components/ui/Link';
@@ -13,7 +12,6 @@ const components: MDXComponents = {
   a: Link,
   pre: Pre,
   table: TableWrapper,
-  BlogNewsletterForm,
 };
 
 export default components;

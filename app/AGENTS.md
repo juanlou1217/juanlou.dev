@@ -30,7 +30,6 @@ open http://localhost:3000/about        # About page
 
 # Test API endpoints
 curl http://localhost:3000/api/stats
-curl http://localhost:3000/api/spotify
 curl http://localhost:3000/api/github
 curl http://localhost:3000/api/newsletter
 ```
@@ -69,7 +68,6 @@ app/
 │
 └── api/                    # API routes
     ├── stats/route.ts      # GET/POST /api/stats
-    ├── spotify/route.ts    # GET /api/spotify
     ├── github/route.ts     # GET /api/github
     └── newsletter/route.ts # POST /api/newsletter
 ```

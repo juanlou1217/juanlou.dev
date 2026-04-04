@@ -48,7 +48,6 @@ components/
 ├── homepage/           # Homepage components
 │   ├── Avatar.tsx
 │   ├── Greeting.tsx
-│   ├── SpotifyNowPlaying.tsx
 │   └── index.ts
 ├── project/            # Project showcase components
 └── ui/                 # Generic UI components
@@ -104,7 +103,7 @@ import { BlogMeta, BlogNav, Reactions } from '@/components/blog'
 import { Button, Card, Link, Tag } from '@/components/ui'
 
 // From homepage
-import { Avatar, Greeting, SpotifyNowPlaying } from '@/components/homepage'
+import { Avatar, Greeting, ProfileCard } from '@/components/homepage'
 ```
 
 ### 使用 UI 组件

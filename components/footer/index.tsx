@@ -1,10 +1,10 @@
 import clsx from 'clsx';
+import NextImage from 'next/image';
 
 import Container from '@/components/ui/Container';
 import SITE_METADATA from '@/data/siteMetadata';
 
 import LogoAndRepo from './LogoAndRepo';
-import Signature from './Signature';
 import FooterMeta from './FooterMeta';
 import FooterNav from './FooterNav';
 import FooterBottom from './FooterBottom';
@@ -24,7 +24,13 @@ const Footer: React.FC = () => {
           <div className="pt-4">
             <div className="flex gap-8 py-1.5 md:gap-20">
               <div className="flex items-center">
-                <Signature className="h-24 w-full max-w-3xl" />
+                <NextImage
+                  src="/static/images/footer/footer-mascot.jpg"
+                  alt="Footer mascot"
+                  width={1440}
+                  height={1080}
+                  className="h-24 w-auto rounded-md object-contain"
+                />
               </div>
               <FooterMeta />
             </div>

@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
+import Button from '@/components/ui/Button';
 
 export default function NotFound() {
   return (
@@ -11,12 +12,13 @@ export default function NotFound() {
       <div className="max-w-md">
         <p className="mb-4 text-xl leading-normal font-bold md:text-2xl">Sorry we couldn't find this page.</p>
         <p className="mb-8">But dont worry, you can find plenty of other things on our homepage.</p>
-        <Link
+        <Button
+          as={Link}
           href="/"
-          className="bg-primary-500 hover:bg-primary-600 inline rounded-lg border border-transparent px-4 py-2 text-sm leading-5 font-medium text-white shadow-sm transition-colors duration-150 focus:outline-hidden dark:hover:bg-sky-400"
+          className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 border-transparent text-white! dark:text-white! dark:hover:bg-sky-400"
         >
           Back to homepage
-        </Link>
+        </Button>
       </div>
     </div>
   );

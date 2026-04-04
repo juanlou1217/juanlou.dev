@@ -25,6 +25,8 @@ const FONT_OUTFIT = Outfit({
   variable: '--font-outfit',
 });
 
+const OG_LOCALE = siteMetadata.locale.replace('-', '_');
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
   title: {
@@ -38,7 +40,7 @@ export const metadata: Metadata = {
     url: './',
     siteName: siteMetadata.title,
     images: [siteMetadata.socialBanner],
-    locale: 'en_US',
+    locale: OG_LOCALE,
     type: 'website',
   },
   alternates: {
@@ -70,11 +72,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang={siteMetadata.language} className={`${FONT_OUTFIT.variable} scroll-smooth`} suppressHydrationWarning>
-      <link rel="apple-touch-icon" sizes="76x76" href={`${basePath}/static/favicons/apple-touch-icon.png`} />
+      <link rel="apple-touch-icon" sizes="76x76" href={`${basePath}/static/favicons/tennis-racquet.png`} />
       <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/tennis-racquet.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/tennis-racquet.png" />
       <link rel="manifest" href={`${basePath}/static/favicons/site.webmanifest`} />
-      <link rel="mask-icon" href={`${basePath}/static/favicons/safari-pinned-tab.svg`} color="#5bbad5" />
       <meta name="msapplication-TileColor" content="#000000" />
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />

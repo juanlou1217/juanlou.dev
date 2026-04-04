@@ -34,7 +34,6 @@ pnpm dev
 ```
 hooks/
 ├── use-blog-stats.ts       # Blog statistics (views, likes)
-├── use-now-playing.ts      # Spotify now playing
 ├── use-image-loaded-state.ts # Image loading state
 └── index.ts                # Unified exports
 ```
@@ -106,29 +105,6 @@ function BlogPost({ slug }: { slug: string }) {
 }
 ```
 
-### 使用 Spotify Hook
-
-```typescript
-import { useNowPlaying } from '@/hooks/use-now-playing'
-
-function SpotifyWidget() {
-  const { isPlaying, title, artist, albumImageUrl, songUrl } = useNowPlaying()
-
-  if (!isPlaying) {
-    return <div>Not playing</div>
-  }
-
-  return (
-    <div>
-      <img src={albumImageUrl} alt={title} />
-      <a href={songUrl}>
-        {title} - {artist}
-      </a>
-    </div>
-  )
-}
-```
-
 ### 使用图片加载 Hook
 
 ```typescript
@@ -179,7 +155,6 @@ export function useMyData(key: string) {
 Hooks 调用的 API 端点：
 
 - `useBlogStats`: `/api/stats?type={type}&slug={slug}`
-- `useNowPlaying`: `/api/spotify`
 - 自定义 hook: 根据需求调用对应 API
 
 ---

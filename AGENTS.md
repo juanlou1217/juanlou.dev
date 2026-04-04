@@ -6,7 +6,6 @@
 
 - 使用 Contentlayer 2 管理 MDX 博客内容，提供类型安全的内容查询
 - 通过 PostgreSQL + Prisma 7 存储文章统计数据（浏览量、点赞数）
-- 集成 Spotify API 显示正在播放的音乐
 - 集成 GitHub GraphQL API 展示仓库信息
 - 使用 Tailwind CSS 4 实现响应式设计
 
@@ -327,9 +326,6 @@ function BlogPost({ slug }: { slug: string }) {
 ```typescript
 import { fetcher } from '@/lib/utils'
 
-// Get Spotify now playing
-const data = await fetcher('/api/spotify')
-
 // Get GitHub stats
 const stats = await fetcher('/api/github')
 ```
@@ -474,7 +470,6 @@ open http://localhost:3000/about    # About page
 
 # Test API endpoints
 curl http://localhost:3000/api/stats
-curl http://localhost:3000/api/spotify
 curl http://localhost:3000/api/github
 ```
 
@@ -525,14 +520,14 @@ pnpm prisma migrate status
 2. PostgreSQL 服务是否运行
 3. Docker 环境检查容器网络：`docker compose ps`
 
-### Spotify/GitHub API 无数据
+### GitHub API 无数据
 
 **症状**: 组件显示空白或 loading 状态
 
 **检查**:
-1. 环境变量是否配置（`SPOTIFY_*`, `GITHUB_API_TOKEN`）
-2. Token 是否过期（Spotify refresh token 需定期更新）
-3. 浏览器控制台查看 API 响应：`/api/spotify`, `/api/github`
+1. 环境变量是否配置（`GITHUB_API_TOKEN`）
+2. Token 是否正确且权限充足
+3. 浏览器控制台查看 API 响应：`/api/github`
 
 ### 样式不生效
 
@@ -604,7 +599,7 @@ pnpm prisma migrate status
 │  └──────────────┘  └──────────────┘  └──────────────┘         │
 │         ↓                  ↓                  ↓                 │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
-│  │ MDX 文件     │  │ PostgreSQL   │  │ Spotify API  │         │
+│  │ MDX 文件     │  │ PostgreSQL   │  │ GitHub API   │         │
 │  │ (data/blog/) │  │ (统计数据)    │  │ GitHub API   │         │
 │  └──────────────┘  └──────────────┘  └──────────────┘         │
 └─────────────────────────────────────────────────────────────────┘
@@ -679,28 +674,6 @@ PostgreSQL 数据库
     └─ tbl_stats 表 (type, slug, views, loves, ...)
 ```
 
-**第三方 API 数据流**
-
-```
-Client Component (components/homepage/SpotifyNowPlaying.tsx)
-    ↓
-Custom Hook (hooks/use-now-playing.ts)
-    ├─ SWR 轮询 (30秒刷新)
-    └─ 缓存策略
-    ↓
-API Route (app/api/spotify/route.ts)
-    ├─ 刷新 Access Token
-    └─ 调用 Spotify API
-    ↓
-Service Layer (lib/services/spotify.ts)
-    ├─ OAuth Token 管理
-    ├─ API 请求封装
-    └─ 数据转换
-    ↓
-Spotify Web API
-    └─ 返回正在播放的音乐信息
-```
-
 #### 3. 组件分层策略
 
 ```
@@ -725,7 +698,6 @@ Spotify Web API
 │  - BlogMeta (文章元信息)                                 │
 │  - Reactions (点赞组件)                                  │
 │  - ViewCounter (浏览量)                                  │
-│  - SpotifyNowPlaying (音乐播放)                          │
 └─────────────────────────────────────────────────────────┘
                         ↓ 使用
 ┌─────────────────────────────────────────────────────────┐
@@ -907,6 +879,15 @@ Components (components/)
 
 ```
 docs/
+├── project/               # 面向 GitHub 访客的公开项目文档
+│   ├── PROJECT_INTRODUCTION.md  # 项目详细介绍（适合 GitHub 展示）
+│   └── ...                # 项目背景、架构、使用说明
+├── harness/               # 面向 AI 和维护者的工作文档区
+│   ├── canonical/         # Harness facts / 协作事实层
+│   ├── specs/             # Harness specs / 需求与任务入口
+│   ├── contracts/         # Harness contracts / 数据与接口契约
+│   ├── verification/      # Harness verification / 验证与回归检查
+│   └── traces/            # Harness traces / 变更记录与复盘
 ├── requirements/           # 需求文档
 │   ├── FEATURE_XXX.md     # 功能需求
 │   └── BUG_XXX.md         # Bug 修复需求
@@ -920,6 +901,25 @@ docs/
 └── notes/                 # 开发笔记
     └── MIGRATION_LOG.md   # 迁移日志
 ```
+
+### Harness 文档分层
+
+为了让这个仓库更适合长期维护、公开展示和 AI coding agent 接手开发，`docs/` 下明确拆分为两个区域：
+
+- `docs/project/`: 面向 GitHub 访客和公开读者，负责介绍项目本身
+- `docs/harness/`: 面向 AI agents 和维护者，负责需求、契约、验证和交付留痕
+
+其中：
+
+- `docs/project/PROJECT_INTRODUCTION.md` 是公开项目介绍入口
+- `docs/harness/README.md` 是 AI 工作文档入口
+
+当前建议 AI 在进入非微小任务前，至少优先阅读：
+
+- `docs/harness/canonical/REPO_SPECIFIC_RULES.md`
+- `docs/harness/canonical/COMPONENT_INVENTORY.md`
+- `docs/harness/canonical/CAPABILITY_STATUS_MATRIX.md`
+- `docs/harness/verification/TASK_START_CHECKLIST.md`
 
 ### 文档命名规范
 

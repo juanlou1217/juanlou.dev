@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import Twemoji from '@/components/ui/Twemoji';
-import MusicBar from '@/components/homepage/MusicBar';
 
 function Greeting() {
   return (

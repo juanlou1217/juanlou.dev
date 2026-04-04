@@ -78,10 +78,6 @@ const baseConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'i.scdn.co', // Spotify album covers
-      },
-      {
-        protocol: 'https',
         hostname: 'placehold.co', // Placeholder images
       },
       {

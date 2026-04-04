@@ -159,14 +159,19 @@ const Reactions = (props: ReactionsProps) => {
 
   // Use useCallback to create stable callback references (rerender-functional-setstate)
   const handleOnSave = useCallback(
-    (key: keyof ReactionState) => {
-      const typedStats = stats as Stats;
-      const newValue = typedStats[key] + state.reactions[key] - state.initial[key];
-      updateReaction({ slug, type, [key]: newValue });
+    async (key: keyof ReactionState) => {
+      const delta = state.reactions[key] - state.initial[key];
+
+      if (delta <= 0) {
+        return;
+      }
+
+      await updateReaction({ slug, type, metric: key, count: delta });
 
       localStorage.setItem(storageKey, JSON.stringify(state.reactions));
+      setState((prev) => ({ ...prev, initial: prev.reactions }));
     },
-    [slug, type, stats, state, updateReaction, storageKey]
+    [slug, type, state, updateReaction, storageKey]
   );
 
   const handleReact = useCallback((key: keyof ReactionState, value: number) => {

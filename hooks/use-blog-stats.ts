@@ -3,7 +3,14 @@ import useSWRMutation from 'swr/mutation';
 
 import { fetcher } from '@/lib/utils';
 
-import type { Stats, StatsType } from '@/types/prisma';
+import type { Stats, StatsMetric, StatsType } from '@/types/prisma';
+
+interface UpdateBlogStatsInput {
+  type: StatsType;
+  slug: string;
+  metric: StatsMetric;
+  count?: number;
+}
 
 export function useBlogStats(type: StatsType, slug: string) {
   const { data, isLoading } = useSWR<Stats>(`/api/stats?slug=${slug}&type=${type}`, fetcher, {
@@ -28,11 +35,20 @@ export function useBlogStats(type: StatsType, slug: string) {
 }
 
 export function useUpdateBlogStats() {
-  const { trigger } = useSWRMutation('/api/stats', async (url: string, { arg }: { arg: Partial<Stats> }) => {
-    return fetch(url, {
+  const { trigger } = useSWRMutation('/api/stats', async (url: string, { arg }: { arg: UpdateBlogStatsInput }) => {
+    const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(arg),
-    }).catch(console.error);
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update stats: ${response.status}`);
+    }
+
+    return response.json();
   });
 
   return trigger;

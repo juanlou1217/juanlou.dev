@@ -5,9 +5,8 @@
 ## 目录
 
 - [1. GitHub 仓库信息](#1-github-仓库信息)
-- [2. Spotify 正在播放](#2-spotify-正在播放)
-- [3. 博客统计](#3-博客统计)
-- [4. Newsletter 订阅](#4-newsletter-订阅)
+- [2. 博客统计](#2-博客统计)
+- [3. Newsletter 订阅](#3-newsletter-订阅)
 
 ---
 
@@ -81,83 +80,7 @@ const repoData = await response.json();
 
 ---
 
-## 2. Spotify 正在播放
-
-获取当前 Spotify 正在播放的音乐信息。
-
-### 请求
-
-```http
-GET /api/spotify
-```
-
-### 参数
-
-无
-
-### 响应示例
-
-**正在播放音乐**
-
-```json
-{
-  "isPlaying": true,
-  "title": "Shape of You",
-  "artist": "Ed Sheeran",
-  "album": "÷ (Deluxe)",
-  "albumImageUrl": "https://i.scdn.co/image/...",
-  "songUrl": "https://open.spotify.com/track/..."
-}
-```
-
-**正在播放播客**
-
-```json
-{
-  "isPlaying": true,
-  "title": "Episode 123: Tech Talk",
-  "songUrl": "https://open.spotify.com/episode/..."
-}
-```
-
-**未播放**
-
-```json
-{
-  "isPlaying": false
-}
-```
-
-### 使用示例
-
-```typescript
-// 使用 Hook（推荐）
-import { useNowPlaying } from '@/hooks';
-
-function NowPlaying() {
-  const { isPlaying, title, artist } = useNowPlaying();
-  
-  return (
-    <div>
-      {isPlaying ? `${title} - ${artist}` : 'Not playing'}
-    </div>
-  );
-}
-```
-
-### 配置要求
-
-需要在 `.env.local` 中配置：
-
-```env
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-SPOTIFY_REFRESH_TOKEN=your_refresh_token
-```
-
----
-
-## 3. 博客统计
+## 2. 博客统计
 
 管理博客文章的浏览量和用户反应（点赞、鼓掌等）。
 
@@ -288,7 +211,7 @@ function BlogPost({ slug }: { slug: string }) {
 
 ---
 
-## 4. Newsletter 订阅
+## 3. Newsletter 订阅
 
 处理邮件列表订阅（使用 Pliny Newsletter API）。
 
@@ -343,11 +266,6 @@ POSTGRES_URL=postgresql://user:password@localhost:5432/karhdo_blog
 # GitHub API（用于项目页面）
 GITHUB_API_TOKEN=ghp_xxxxxxxxxxxxx
 
-# Spotify API（用于首页音乐组件）
-SPOTIFY_CLIENT_ID=xxxxxxxxxxxxx
-SPOTIFY_CLIENT_SECRET=xxxxxxxxxxxxx
-SPOTIFY_REFRESH_TOKEN=xxxxxxxxxxxxx
-
 # Giscus 评论系统
 NEXT_PUBLIC_GISCUS_REPO=username/repo
 NEXT_PUBLIC_GISCUS_REPOSITORY_ID=R_xxxxx
@@ -372,7 +290,6 @@ NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_xxxxx
 | 状态码 | 说明 |
 |--------|------|
 | 200 | 请求成功 |
-| 204 | 无内容（Spotify 未播放） |
 | 400 | 请求参数错误 |
 | 500 | 服务器内部错误 |
 
@@ -380,7 +297,6 @@ NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_xxxxx
 
 ## 速率限制
 
-- **Spotify API**：客户端使用 SWR 缓存，30 秒刷新一次
 - **Stats API**：无限制，但建议使用 SWR 做客户端缓存
 - **GitHub API**：受 GitHub API 速率限制约束（每小时 5000 次）
 
@@ -388,7 +304,7 @@ NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_xxxxx
 
 ## 安全性
 
-- 所有敏感 Token（GitHub、Spotify）仅在服务端使用
+- 所有敏感 Token（GitHub）仅在服务端使用
 - API 路由不直接暴露 Token 给客户端
 - 使用环境变量管理配置
 - CSP 安全头配置在 `next.config.mjs`

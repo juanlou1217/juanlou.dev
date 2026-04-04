@@ -4,12 +4,12 @@
 
 `lib/` 目录包含工具函数和外部服务集成。职责：
 
-- 封装第三方 API 调用（GitHub, Spotify）
+- 封装第三方 API 调用（GitHub）
 - 提供数据库客户端（Prisma）
 - 实现通用工具函数（fetcher, formatters）
 - 处理 SEO 相关逻辑
 
-**依赖**: Prisma, Octokit (GitHub API), Spotify Web API, PostgreSQL
+**依赖**: Prisma, Octokit (GitHub API), PostgreSQL
 
 **不负责**: UI 渲染（在 `components/`）、路由逻辑（在 `app/`）
 
@@ -24,9 +24,6 @@ pnpm dev
 # Test services (requires env vars)
 # GitHub API
 curl http://localhost:3000/api/github
-
-# Spotify API
-curl http://localhost:3000/api/spotify
 
 # Database (Prisma)
 pnpm prisma studio
@@ -43,7 +40,7 @@ lib/
 ├── services/               # External service integrations
 │   ├── prisma.ts           # Prisma database client
 │   ├── github.ts           # GitHub GraphQL API
-│   └── spotify.ts          # Spotify Web API
+│   └── ...
 │
 ├── utils/                  # Utility functions
 │   └── index.ts            # Common utilities (fetcher, etc.)
@@ -53,10 +50,10 @@ lib/
 
 ### 命名规范
 
-- **服务文件**: 小写 (`github.ts`, `spotify.ts`)
+- **服务文件**: 小写 (`github.ts`, `prisma.ts`)
 - **函数**: camelCase (`getGitHubStats`, `getNowPlaying`)
-- **常量**: UPPER_SNAKE_CASE (`SPOTIFY_TOKEN_URL`)
-- **类型**: PascalCase (`GitHubStats`, `SpotifyTrack`)
+- **常量**: UPPER_SNAKE_CASE (`GITHUB_QUERY`)
+- **类型**: PascalCase (`GitHubStats`, `RepositoryData`)
 
 ---
 
@@ -101,16 +98,6 @@ import { getGitHubStats } from '@/lib/services/github'
 // Get repository stats
 const stats = await getGitHubStats()
 // Returns: { stars: 100, forks: 20, ... }
-```
-
-### 调用 Spotify API
-
-```typescript
-import { getNowPlaying } from '@/lib/services/spotify'
-
-// Get currently playing track
-const track = await getNowPlaying()
-// Returns: { isPlaying: true, title: 'Song', artist: 'Artist', ... }
 ```
 
 ### 使用工具函数
@@ -180,65 +167,6 @@ export async function getGitHubStats() {
   }
 }
 ```
-
-### Spotify API (`services/spotify.ts`)
-
-需要环境变量：
-```bash
-SPOTIFY_CLIENT_ID=xxxxx
-SPOTIFY_CLIENT_SECRET=xxxxx
-SPOTIFY_REFRESH_TOKEN=xxxxx
-```
-
-```typescript
-const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token'
-const SPOTIFY_NOW_PLAYING_URL = 'https://api.spotify.com/v1/me/player/currently-playing'
-
-async function getAccessToken() {
-  const response = await fetch(SPOTIFY_TOKEN_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${Buffer.from(
-        `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
-      ).toString('base64')}`,
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: process.env.SPOTIFY_REFRESH_TOKEN!,
-    }),
-  })
-
-  return response.json()
-}
-
-export async function getNowPlaying() {
-  const { access_token } = await getAccessToken()
-
-  const response = await fetch(SPOTIFY_NOW_PLAYING_URL, {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-  })
-
-  if (response.status === 204 || response.status > 400) {
-    return { isPlaying: false }
-  }
-
-  const song = await response.json()
-
-  return {
-    isPlaying: song.is_playing,
-    title: song.item.name,
-    artist: song.item.artists.map((artist: any) => artist.name).join(', '),
-    album: song.item.album.name,
-    albumImageUrl: song.item.album.images[0].url,
-    songUrl: song.item.external_urls.spotify,
-  }
-}
-```
-
----
 
 ## Common Tasks
 
@@ -362,19 +290,6 @@ curl http://localhost:3000/api/github
 {"stars":100,"forks":20}
 ```
 
-### 测试 Spotify API
-
-```bash
-# Test via API route
-curl http://localhost:3000/api/spotify
-
-# Expected response (playing)
-{"isPlaying":true,"title":"Song Name","artist":"Artist Name"}
-
-# Expected response (not playing)
-{"isPlaying":false}
-```
-
 ### 测试工具函数
 
 ```typescript
@@ -424,21 +339,6 @@ pnpm prisma migrate status
 - 使用认证 token（提高限额到 5000/hour）
 - 添加缓存（SWR `refreshInterval`）
 - 使用 GraphQL 减少请求次数
-
-### Spotify Token 过期
-
-**症状**: API 返回 401 Unauthorized
-
-**检查**:
-1. `SPOTIFY_REFRESH_TOKEN` 是否有效
-2. `SPOTIFY_CLIENT_ID` 和 `SPOTIFY_CLIENT_SECRET` 是否正确
-3. Refresh token 是否过期（需重新授权）
-
-**解决**:
-```bash
-# Get new refresh token (follow Spotify OAuth flow)
-# https://developer.spotify.com/documentation/web-api/tutorials/code-flow
-```
 
 ### Fetcher 错误处理
 
@@ -539,5 +439,4 @@ docs/
 
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [GitHub GraphQL API](https://docs.github.com/en/graphql)
-- [Spotify Web API](https://developer.spotify.com/documentation/web-api)
 - [Next.js API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)

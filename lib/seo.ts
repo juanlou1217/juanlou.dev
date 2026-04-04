@@ -10,6 +10,8 @@ interface PageSEOProps {
 }
 
 export function genPageMetadata({ title, description, image, ...rest }: PageSEOProps): Metadata {
+  const ogLocale = siteMetadata.locale.replace('-', '_');
+
   return {
     title,
     description: description || siteMetadata.description,
@@ -19,7 +21,7 @@ export function genPageMetadata({ title, description, image, ...rest }: PageSEOP
       url: './',
       siteName: siteMetadata.title,
       images: image ? [image] : [siteMetadata.socialBanner],
-      locale: 'en_US',
+      locale: ogLocale,
       type: 'website',
     },
     twitter: {

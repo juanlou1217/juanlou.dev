@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Image from '@/components/ui/Image';
-import SpotifyNowPlaying from '@/components/homepage/SpotifyNowPlaying';
 import { clsx } from 'clsx';
 
 const Avatar = () => {

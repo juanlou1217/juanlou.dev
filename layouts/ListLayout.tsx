@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { usePathname } from 'next/navigation';
 import { formatDate } from 'pliny/utils/formatDate';
 import { CoreContent } from 'pliny/utils/contentlayer';
 import type { Blog } from 'contentlayer/generated';
@@ -13,6 +12,7 @@ import siteMetadata from '@/data/siteMetadata';
 interface PaginationProps {
   totalPages: number;
   currentPage: number;
+  basePath?: string;
 }
 interface ListLayoutProps {
   posts: CoreContent<Blog>[];
@@ -21,9 +21,7 @@ interface ListLayoutProps {
   pagination?: PaginationProps;
 }
 
-function Pagination({ totalPages, currentPage }: PaginationProps) {
-  const pathname = usePathname();
-  const basePath = pathname.split('/')[1];
+function Pagination({ totalPages, currentPage, basePath = '/blog' }: PaginationProps) {
   const prevPage = currentPage - 1 > 0;
   const nextPage = currentPage + 1 <= totalPages;
 
@@ -36,7 +34,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
           </button>
         )}
         {prevPage && (
-          <Link href={currentPage - 1 === 1 ? `/${basePath}/` : `/${basePath}/page/${currentPage - 1}`} rel="prev">
+          <Link href={currentPage - 1 === 1 ? basePath : `${basePath}/page/${currentPage - 1}`} rel="prev">
             上一页
           </Link>
         )}
@@ -49,7 +47,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
           </button>
         )}
         {nextPage && (
-          <Link href={`/${basePath}/page/${currentPage + 1}`} rel="next">
+          <Link href={`${basePath}/page/${currentPage + 1}`} rel="next">
             下一页
           </Link>
         )}
@@ -143,7 +141,11 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
         </ul>
       </div>
       {pagination && pagination.totalPages > 1 && !searchValue && (
-        <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} />
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          basePath={pagination.basePath}
+        />
       )}
     </>
   );

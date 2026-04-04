@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-这是一个使用 Next.js 16、React 19、TypeScript 和 Tailwind CSS 构建的个人博客。博客使用 Contentlayer 进行 MDX 内容管理，并部署在 Vercel 上。它基于 Tailwind Nextjs Starter Blog 模板，并进行了自定义增强，包括 Tokyonight 主题色彩以及与外部服务（Spotify、GitHub、PostgreSQL）的集成。
+这是一个使用 Next.js 16、React 19、TypeScript 和 Tailwind CSS 构建的个人博客。博客使用 Contentlayer 进行 MDX 内容管理，并部署在 Vercel 上。它基于 Tailwind Nextjs Starter Blog 模板，并进行了自定义增强，包括 Tokyonight 主题色彩以及与外部服务（GitHub、PostgreSQL）的集成。
 
 ## 命令
 
@@ -85,9 +85,6 @@ pnpm migrate:postgres   # 使用 .env.local 运行 Prisma 迁移
 
 博客通过 API 路由和服务器工具与外部服务集成：
 
-- **Spotify** (`app/api/spotify/route.ts`、`servers/spotify.server.ts`)：获取当前播放的曲目
-  - 需要：`SPOTIFY_CLIENT_ID`、`SPOTIFY_CLIENT_SECRET`、`SPOTIFY_REFRESH_TOKEN`
-
 - **GitHub** (`app/api/github/route.ts`、`servers/github.server.ts`)：为项目页面获取仓库数据
   - 需要：`GITHUB_API_TOKEN`
   - 使用 `@octokit/graphql` 进行 GraphQL API 查询
@@ -140,7 +137,6 @@ pnpm migrate:postgres   # 使用 .env.local 运行 Prisma 迁移
 
 - **数据库**：`POSTGRES_URL`
 - **GitHub 集成**：`GITHUB_API_TOKEN`
-- **Spotify 集成**：`SPOTIFY_CLIENT_ID`、`SPOTIFY_CLIENT_SECRET`、`SPOTIFY_REFRESH_TOKEN`
 - **评论**：`NEXT_PUBLIC_GISCUS_*` 变量
 - **分析**：`UMAMI_WEBSITE_ID`（可选）
 

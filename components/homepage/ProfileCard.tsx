@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Image from '@/components/ui/Image';
 import ProfileInfo from '@/components/homepage/ProfileInfo';
-import SpotifyNowPlaying from '@/components/homepage/SpotifyNowPlaying';
 
 const ProfileCard = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -63,8 +62,6 @@ const ProfileCard = () => {
         <div style={style} className="max-h-[430px] overflow-hidden rounded-md transition-all duration-200 ease-out">
           <Image src={'/static/images/avatar_backup.jpg'} alt="avatar" width={430} height={430} />
         </div>
-
-        {/*<SpotifyNowPlaying />*/}
         <ProfileInfo />
         <div className="h-1.5 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></div>
       </div>

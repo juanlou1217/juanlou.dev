@@ -8,7 +8,7 @@ import { HEADER_NAV_LINKS } from '@/data/navigation';
 
 import Link from '@/components/ui/Link';
 
-import Logo from 'public/static/images/logo.svg';
+import Logo from 'public/static/images/logo-juanlou.svg';
 
 import MobileNav from './MobileNav';
 import ThemeSwitch from './ThemeSwitch';
@@ -28,9 +28,9 @@ const Header = () => {
   return (
     <header className={headerClass}>
       <div className="mx-auto flex max-w-4xl items-center justify-between px-3 xl:max-w-5xl xl:px-0">
-        <Link href="/" aria-label={siteMetadata.headerTitle} className="flex items-center">
-          <div className="animate-wave">
-            <Logo className="fill-dark dark:fill-white" />
+        <Link href="/" aria-label={siteMetadata.headerTitle} className="group flex items-center">
+          <div className="text-dark transition-transform duration-300 group-hover:-rotate-3 dark:text-white">
+            <Logo className="h-8 w-8" />
           </div>
           <div className="group ml-2 text-xl font-bold transition duration-300">
             卷娄的折腾日记

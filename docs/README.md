@@ -5,11 +5,12 @@
 如果你是第一次进入这个仓库，建议按下面顺序阅读：
 
 1. [项目详细介绍](./project/PROJECT_INTRODUCTION.md)
-2. [搭建与启动指南](./project/SETUP_GUIDE.md)
-3. [项目结构说明](./project/PROJECT_STRUCTURE_GUIDE.md)
-4. [AI 协作规范](./project/AI_COLLABORATION_GUIDE.md)
-5. [API 接口文档](../API_DOCUMENTATION.md)
-6. [内容维护指南](./guides/CONTENT_UPDATE_GUIDE.md)
+2. [博客项目搭建拆解](./project/BLOG_BUILDING_GUIDE.md)
+3. [搭建与启动指南](./project/SETUP_GUIDE.md)
+4. [项目结构说明](./project/PROJECT_STRUCTURE_GUIDE.md)
+5. [AI 协作规范](./project/AI_COLLABORATION_GUIDE.md)
+6. [API 接口文档](../API_DOCUMENTATION.md)
+7. [内容维护指南](./guides/CONTENT_UPDATE_GUIDE.md)
 
 ## 两个独立文档区
 
@@ -17,6 +18,8 @@
 
 - [项目详细介绍](./project/PROJECT_INTRODUCTION.md)
   说明这个博客项目是什么、当前能力边界是什么。
+- [博客项目搭建拆解](./project/BLOG_BUILDING_GUIDE.md)
+  从技术选型、数据流和工程取舍角度拆解这个博客是怎么搭起来的。
 - [搭建与启动指南](./project/SETUP_GUIDE.md)
   说明本地开发、构建部署和基础环境配置。
 - [项目结构说明](./project/PROJECT_STRUCTURE_GUIDE.md)
@@ -54,6 +57,7 @@
 如果这个仓库是用于公开展示，下面几个文件最适合放在 GitHub 上给读者浏览：
 
 - [项目详细介绍](./project/PROJECT_INTRODUCTION.md)
+- [博客项目搭建拆解](./project/BLOG_BUILDING_GUIDE.md)
 - [搭建与启动指南](./project/SETUP_GUIDE.md)
 - [项目结构说明](./project/PROJECT_STRUCTURE_GUIDE.md)
 - [AI 协作规范](./project/AI_COLLABORATION_GUIDE.md)

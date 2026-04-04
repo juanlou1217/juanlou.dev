@@ -24,9 +24,11 @@
 ### 公开项目文档
 
 - [项目详细介绍](docs/project/PROJECT_INTRODUCTION.md) - 面向 GitHub 读者的完整项目说明
+- [博客项目搭建拆解](docs/project/BLOG_BUILDING_GUIDE.md) - 适合写项目搭建博文时参考的技术拆解与提纲
 - [搭建与启动指南](docs/project/SETUP_GUIDE.md) - 如何把项目在本地或服务器上跑起来
 - [项目结构说明](docs/project/PROJECT_STRUCTURE_GUIDE.md) - 当前仓库的高层结构与主线能力
 - [AI 协作规范](docs/project/AI_COLLABORATION_GUIDE.md) - 当前 AI coding agent 应遵守的 repo-specific 规则
+- `docs/style/` - 作者审美、表达偏好与共享写作风格约定
 - [文档中心](docs/README.md) - 文档导航入口
 
 ### Harness 工作文档
@@ -54,6 +56,7 @@
 - 👨‍💻 我的网站参考了 [lehuynh.dev](https://leohuynh.dev/) 仓库的设计和代码，并整合了 tailwind-nextjs-starter-blog 模板 1.0 版本
 - 📥 将 `mdx-bundler`、`rehype`/`remark` 插件和依赖项升级到最新版本
 - 📚 增加了一套适配当前仓库的 Harness 文档层，便于 AI agents 和协作者快速接手
+- ✍️ 增加 `docs/style/` 风格目录，让写作类 skill 先识别作者审美和表达偏好，再生成更贴近作者本人的文章内容
 
 ## Docker 部署
 

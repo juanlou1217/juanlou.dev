@@ -2,121 +2,210 @@
 
 ## 项目是什么
 
-这是一个基于 **Next.js 16 + React 19 + TypeScript** 构建的个人博客系统，面向“公开写作 + 轻量展示 + 可持续维护”场景设计。
+这是一个基于 **Next.js 16 + React 19 + TypeScript** 构建的个人博客系统，面向“长期写作、个人表达、轻量动态能力、持续维护”几个目标设计。
 
-它不是一个只负责渲染静态文章的简单站点，也不是一个强调后台运营能力的 CMS。当前项目更像一个围绕个人表达搭建的内容平台，兼顾以下三类能力：
+它不是传统意义上的后台驱动 CMS，也不是只放几篇静态文章的演示站点。这个项目的定位更接近：
 
-- 内容发布：使用 MDX 编写技术文章、生活随笔和随想
-- 个人展示：展示项目、个人信息、链接和实验页面
-- 轻量动态能力：文章统计、GitHub 仓库数据
+- 用 MDX 写作的个人内容平台
+- 以博客为主线的个人网站
+- 在静态内容基础上补充少量实时能力的工程化博客
 
 站点名称为“卷娄的小屋 / 卷娄的折腾日记”，公开地址为 [juanlou.top](https://juanlou.top)。
+
+## 这个项目为什么这样搭
+
+如果只用一句话概括，这个项目是在追求一个平衡：
+
+- 内容管理要足够简单，不想引入复杂 CMS
+- 页面展示要足够快，适合公开访问和 SEO
+- 交互能力要适量，比如浏览量、点赞、评论、仓库信息
+- 仓库结构要足够清晰，后续自己维护或交给 AI 都能接得住
+
+因此它最终选了“**文件内容驱动 + 构建期预处理 + 局部运行时增强**”这条路线。
 
 ## 适合谁阅读这个仓库
 
 - 想搭建个人博客或内容站点的开发者
-- 想了解 `Next.js + Contentlayer + Prisma` 组合的读者
-- 想把现有项目整理成 agent-ready repo 的协作者
-- 需要快速接手维护本博客的开发者或 AI coding agent
+- 想了解 `Next.js + MDX + Contentlayer + Prisma` 如何组合的人
+- 想写“个人博客从零搭建”主题文章的创作者
+- 想把仓库整理成适合长期维护、适合 AI 接手的协作者
 
-## 核心能力
+## 当前对外主线能力
 
-### 1. MDX 内容驱动
+当前公开能力集中在博客主线，不追求“大而全”，而是先把高频访问路径做稳。
 
-博客文章存放在 `data/blog/`，通过 Contentlayer 在构建阶段解析 frontmatter、生成类型定义、提取目录和阅读时长。
+### 内容与页面
 
-这意味着：
-
-- 内容由文件系统管理，适合 Git 版本控制
-- 页面生成偏静态，利于 SEO 和性能
-- 文章结构具备较好的类型安全和可维护性
-
-### 2. App Router 页面组织
-
-项目采用 Next.js App Router，主要页面包括：
-
-- `/`：首页
-- `/blog`：博客列表页
+- `/`：首页，聚合个人简介、分类入口、最近文章、热门标签
+- `/blog`：博客总列表
+- `/blog/tech`、`/blog/life`、`/blog/essay`：分类列表
 - `/blog/[...slug]`：文章详情页
-- `/blog/tech`、`/blog/life`、`/blog/essay`：分类列表页
-- `/tags`：标签页
+- `/tags` 与 `/tags/[tag]`：标签聚合与标签详情
 - `/about`：关于页
-- `/lab`：实验室占位页
+- `/feed.xml`：RSS 订阅
 
-### 3. 运行时动态数据
+### 轻量动态能力
 
-虽然大部分页面以静态内容为主，但项目也接入了少量实时数据：
+- `/api/stats`：文章浏览量与互动统计
+- `/api/github`：GitHub 仓库数据
+- Giscus 评论：文章页评论区
+- 搜索索引：构建时生成 `search.json`，前端通过搜索入口调用
 
-- `/api/stats`：文章浏览量与互动数据
-- `/api/github`：仓库信息与最近提交等数据
-- `/feed.xml`：RSS 订阅源
+### 当前保留但不扩展的区域
 
-### 4. 面向公开访问的视觉站点
+- `/lab`：仅保留占位入口
+- `/projects`：当前直接返回 404
+- `/api/newsletter`：返回未启用状态
 
-项目使用 Tailwind CSS 4 构建响应式界面，适合部署在 Vercel，也支持 Docker 独立部署。
+这也是这个仓库的一个重要边界：**不是目录存在就代表功能开放**。
 
-## 技术栈
+## 核心设计思路
+
+### 1. 内容优先，而不是后台优先
+
+文章和作者信息都直接放在仓库里：
+
+- `data/blog/*.mdx`
+- `data/authors/*.mdx`
+
+这样做的好处是：
+
+- 内容天然进入 Git 版本管理
+- 写作流程就是“改文件 + 提交代码”
+- 不需要额外维护后台系统、权限系统、内容审核流
+- 构建时就能生成类型和派生数据，减少运行时复杂度
+
+### 2. 静态为主，动态为辅
+
+大多数页面本质上是内容展示页，因此适合静态生成。
+
+动态能力只放在真正需要运行时数据的地方，比如：
+
+- 浏览量和点赞等互动统计
+- GitHub 仓库最新信息
+- 评论系统
+
+这能让站点保留博客站该有的稳定性和速度，同时避免把整个站点都做成强依赖数据库和服务端渲染的应用。
+
+### 3. 路由层、布局层、组件层分工明确
+
+仓库结构不是“所有逻辑堆在页面里”，而是做了清晰分层：
+
+- `app/` 负责路由、页面入口、API Routes
+- `layouts/` 负责博客列表和文章详情等页面骨架
+- `components/` 负责可复用 UI 和功能组件
+- `lib/` 负责内容工具、SEO、服务层逻辑
+
+这样做的价值是：
+
+- 页面逻辑不会越来越散
+- 文章页和列表页可以复用稳定布局
+- 后续改视觉或改数据源时，影响面更可控
+
+### 4. 风格偏好也单独收口，而不是把作者口吻写死在工具里
+
+这个仓库最近还补了一层比较实用的约束：**把作者的表达偏好和审美偏好单独放进 `docs/style/`，让写作类 skill 先读风格文件，再决定怎么产出内容。**
+
+当前约定是：
+
+- 私有或本地风格文件优先放在 `docs/style/PERSONA_PROFILE.md`
+- 需要共享给协作者时，可以放在 `docs/style/VOICE_AND_STYLE.md`
+- 如果风格目录里没有明确约束，再回退到 `data/authors/default.mdx`、首页自我介绍和公开项目文档
+
+这样做的好处是，写作 skill 不会被绑定成“只会模仿某一个人的固定口吻”，而是可以跟着不同仓库里的风格目录切换。换一个作者，换一份风格文件，skill 的输出就能跟着变。
+
+## 技术栈与选型理由
 
 ### 前端与渲染
 
-- Next.js 16
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- App Router
+- `Next.js 16`
+  使用 App Router，方便把内容页、静态页面、API Routes 放在统一体系里。
+- `React 19`
+  跟进当前 React 版本，作为整个组件体系和交互层基础。
+- `TypeScript`
+  给内容数据、服务调用和组件 props 增加约束，降低“改完才发现类型跑偏”的概率。
+- `Tailwind CSS 4`
+  适合快速维护博客样式体系，也便于做响应式页面。
 
 ### 内容系统
 
-- MDX
-- Contentlayer 2
-- rehype / remark 插件链
-- Pliny 内容工具
+- `MDX`
+  文章写作和组件嵌入体验统一，适合技术博客。
+- `Contentlayer 2`
+  在构建阶段把 MDX 转成可直接查询的内容对象，并生成类型。
+- `remark / rehype`
+  补齐数学公式、代码高亮、标题锚点、引用、表格等写作能力。
+- `Pliny`
+  提供 MDX 渲染和部分内容工具，减少基础设施重复劳动。
 
-### 数据与服务
+### 动态数据与服务
 
-- PostgreSQL
-- Prisma 7
-- GitHub GraphQL API
-- Giscus 评论系统
+- `PostgreSQL`
+  只承担少量结构化数据存储，比如文章统计。
+- `Prisma 7`
+  负责数据库访问和 schema 管理。
+- `GitHub API`
+  用于仓库信息展示；有 Token 时走 GraphQL，没 Token 时回退到公共 REST 接口。
+- `Giscus`
+  借助 GitHub Discussions 做评论，不需要自建评论系统。
 
 ### 工程化
 
-- pnpm
-- ESLint
-- Prettier
-- Husky
-- Docker
+- `pnpm`
+- `ESLint`
+- `Prettier`
+- `Husky`
+- `Docker`
 
-## 系统架构概览
+这一套不是为了“堆工具”，而是为了让本地开发、提交格式、部署方式都尽量稳定。
 
-项目整体采用“静态内容为主，少量动态能力补充”的结构：
+## 真正的数据流是什么
+
+这个项目最值得写进博文的，不是“用了哪些技术”，而是“这些技术怎么连起来工作”。
+
+### 构建时数据流
 
 ```text
-MDX 内容文件
-  -> Contentlayer 构建
-  -> Next.js 页面渲染
-  -> 用户访问静态或增量更新页面
-
-用户交互
-  -> Client Component / Hook
-  -> API Route
-  -> Prisma / 第三方服务
-  -> 返回动态数据
+data/blog/*.mdx
+  -> Contentlayer 解析 frontmatter 和正文
+  -> 生成 slug、目录、阅读时长、结构化数据
+  -> 统计标签，输出 app/tag-data.json
+  -> 生成本地搜索索引 public/search.json
+  -> Next.js 页面按内容生成静态页面
 ```
 
-这种架构的优点是：
+这条链路说明，这个博客并不是运行时再去解析 Markdown，而是在构建阶段先把内容准备好。
 
-- 博客文章加载快，SEO 友好
-- 内容管理简单，不依赖复杂 CMS
-- 需要动态能力时可以通过 API Routes 局部增强
+### 运行时数据流
+
+```text
+用户打开文章页或点击互动按钮
+  -> Client Component / Hook
+  -> /api/stats
+  -> Prisma
+  -> PostgreSQL
+  -> 返回最新统计结果
+```
+
+### 仓库信息数据流
+
+```text
+页面请求仓库信息
+  -> /api/github
+  -> lib/services/github.ts
+  -> GitHub GraphQL API
+  -> 无 Token 时回退到 GitHub REST API
+```
+
+这个设计很适合放进你的博文里，因为它清楚体现了：**静态内容站也可以局部具备“活”的数据能力**。
 
 ## 内容模型
 
-当前主要内容类型为博客文章和作者信息。
+当前项目的主内容类型非常克制，核心只有两类。
 
 ### 博客文章
 
-文章采用 MDX 管理，关键字段包括：
+文章来自 `data/blog/**/*.mdx`，关键字段包括：
 
 - `title`
 - `date`
@@ -127,22 +216,31 @@ MDX 内容文件
 - `authors`
 - `layout`
 - `draft`
+- `lastmod`
+- `bibliography`
+- `canonicalUrl`
 
-其中 `category` 目前固定为：
+其中 `category` 当前限定为：
 
 - `tech`
 - `life`
 - `essay`
 
+这意味着分类是明确受控的，页面结构和内容组织也围绕这三类展开。
+
 ### 作者信息
 
-作者信息存放在 `data/authors/`，用于文章页和站点展示。
+作者信息来自 `data/authors/**/*.mdx`，用于：
+
+- 文章页作者展示
+- About 页面或个人信息区域
+- 结构化数据里的作者信息输出
 
 ## 运行时数据模型
 
-数据库当前主要承担统计数据存储职责。
+数据库目前刻意保持简单，只用来存文章统计，不扩展成复杂业务库。
 
-`Stats` 模型包含：
+`Stats` 模型当前包含：
 
 - `type`
 - `slug`
@@ -152,69 +250,111 @@ MDX 内容文件
 - `ideas`
 - `bullseye`
 
-这个模型用于记录文章或片段的互动统计，主键是 `type + slug`。
+主键是 `type + slug`，其中 `type` 当前支持：
 
-## 仓库结构速览
+- `blog`
+- `snippet`
 
-```text
-app/           页面路由和 API Routes
-components/    React 组件
-layouts/       页面布局
-hooks/         自定义 Hook
-lib/           服务和工具函数
-data/          MDX 内容与站点配置
-prisma/        数据库 schema
-public/        静态资源
-docs/          文档中心与 Harness 文档层
-```
+但从当前公开产品面来看，主线仍然是博客统计。
 
-更详细的目录说明请查看 [项目结构说明](../../PROJECT_STRUCTURE.md)。
+## 当前工程特点
 
-如果你更关心“如何跑起来”和“当前 AI 如何协作”，建议继续看：
+如果你打算写一篇“这个博客是怎么搭起来的”博文，下面这些点值得重点展开。
 
-- [搭建与启动指南](./SETUP_GUIDE.md)
-- [项目结构说明](./PROJECT_STRUCTURE_GUIDE.md)
-- [AI 协作规范](./AI_COLLABORATION_GUIDE.md)
+### 1. 写作体验与工程约束没有分家
+
+博客不是一个单纯的前端展示项目。内容 schema、页面路由、SEO 元数据、搜索索引、RSS、标签聚合，都已经被放在一条一致的数据链里。
+
+### 2. 不是从零手搓一切，而是建立在成熟组合之上
+
+这个项目不是为了炫技去重复造轮子，而是把：
+
+- Next.js
+- Tailwind Nextjs Starter Blog 的经验
+- Pliny 的内容能力
+- Contentlayer 的类型化内容链路
+
+组合成一个更贴近自己需求的仓库。
+
+### 3. 产品面刻意收敛
+
+虽然仓库里存在 `projects`、`lab demos`、newsletter 之类的历史痕迹，但当前对外主线故意收紧在博客本身。
+
+这不是“没做完”，而是一个明确取舍：
+
+- 先把真正高频访问的内容路径做稳
+- 再决定是否扩展边缘能力
+
+### 4. 仓库已经开始面向长期维护
+
+文档区被拆成：
+
+- `docs/project/`：给 GitHub 读者看
+- `docs/harness/`：给维护者和 AI agent 看
+
+这意味着它不只是“我自己的博客源码”，也在向一个可以持续协作、可以被别人接手的仓库演化。
 
 ## 这个项目不负责什么
 
-为了保持边界清晰，当前仓库不承担以下职责：
+为了保持边界清晰，当前仓库不承担这些职责：
 
 - 富文本在线编辑器
 - 用户登录和权限系统
 - 多角色后台管理平台
-- 复杂营销漏斗和商单流程
+- 完整项目展示平台
+- 邮件营销和订阅转化系统
+- 国际化多语言实现
 
-如果后续要扩展这些方向，建议明确作为新阶段需求，不要混入现有博客主线。
+如果后续真要扩展，应该把它们当作新的阶段需求，而不是顺手塞进博客主线。
 
-## 部署方式
+## 适合怎么部署
 
-当前项目支持三种主要部署模式：
+### 本地开发
 
-### 1. 本地开发
+- `pnpm install`
+- 配置 `.env.local`
+- 初始化 PostgreSQL
+- `pnpm dev`
 
-- 使用 `pnpm dev`
-- 数据库可配合本地 PostgreSQL 或 Docker Compose
+适合日常写作、调样式、改页面。
 
-### 2. Docker 部署
+### Docker 部署
 
-- 使用 `docker compose up -d`
-- 适合自托管或统一打包部署
+- `docker compose up -d`
+- `docker compose exec app pnpm prisma:migrate:deploy`
 
-### 3. Vercel 部署
+适合自托管或在自己的服务器上统一打包运行。
 
-- 适合静态内容站点和 Serverless API Routes
-- 数据库可配合 Vercel Postgres、Supabase、Neon 等服务
+### Vercel 部署
+
+适合这个项目当前的形态，因为：
+
+- 静态内容页很多
+- API Routes 比较轻
+- 很适合配合托管数据库一起使用
+
+## 如果你要写这篇项目搭建博文
+
+建议你把文章重点放在三个层面，而不只是技术清单：
+
+1. 为什么需要一个“自己可控、内容优先”的博客系统
+2. 为什么选择“MDX + Contentlayer + Next.js + Prisma”的组合
+3. 这个项目如何在静态站和轻量动态能力之间取得平衡
+
+仓库里已经专门补了一份更适合写博文的材料：
+
+- [博客项目搭建拆解](./BLOG_BUILDING_GUIDE.md)
 
 ## 推荐阅读顺序
 
 如果你是 GitHub 访客，建议按以下顺序阅读：
 
 1. 本文档
-2. [搭建与启动指南](./SETUP_GUIDE.md)
-3. [项目结构说明](./PROJECT_STRUCTURE_GUIDE.md)
-4. [AI 协作规范](./AI_COLLABORATION_GUIDE.md)
-5. [API 接口文档](../../API_DOCUMENTATION.md)
-6. [文档中心](../README.md)
+2. [博客项目搭建拆解](./BLOG_BUILDING_GUIDE.md)
+3. [搭建与启动指南](./SETUP_GUIDE.md)
+4. [项目结构说明](./PROJECT_STRUCTURE_GUIDE.md)
+5. [AI 协作规范](./AI_COLLABORATION_GUIDE.md)
+6. [API 接口文档](../../API_DOCUMENTATION.md)
+7. [文档中心](../README.md)
 
-如果你是维护者或 AI agent，建议再去看 [Harness 文档区](../harness/README.md) 和 [AGENTS.md](../../AGENTS.md)。
+如果你是维护者或 AI agent，建议继续看 [Harness 文档区](../harness/README.md) 和 [AGENTS.md](../../AGENTS.md)。

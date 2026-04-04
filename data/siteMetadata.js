@@ -1,8 +1,8 @@
 const hasGiscusConfig = Boolean(
   process.env.NEXT_PUBLIC_GISCUS_REPO &&
-    process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID &&
-    process.env.NEXT_PUBLIC_GISCUS_CATEGORY &&
-    process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID
+  process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID &&
+  process.env.NEXT_PUBLIC_GISCUS_CATEGORY &&
+  process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID
 );
 
 const siteMetadata = {
@@ -16,7 +16,7 @@ const siteMetadata = {
   siteUrl: 'https://juanlou.top',
   analyticsURL: '',
   siteRepo: 'https://github.com/juanlou1217/juanlou.dev',
-  siteLogo: '/static/images/avatar_backup.jpg',
+  siteLogo: '/static/images/logo-juanlou.svg',
   image: '/static/images/avatar_backup.jpg',
   socialBanner: '/static/images/avatar_backup.jpg',
   email: '3106444523@qq.com',

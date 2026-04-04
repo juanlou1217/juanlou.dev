@@ -6,8 +6,6 @@ COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.prod.yml}"
 ENV_FILE="${ENV_FILE:-.env.production}"
 SWAPFILE_PATH="${SWAPFILE_PATH:-/swapfile}"
 SWAPFILE_SIZE="${SWAPFILE_SIZE:-4G}"
-APP_IMAGE_ARCHIVE="${APP_IMAGE_ARCHIVE:-}"
-
 export DEBIAN_FRONTEND=noninteractive
 
 install_package() {
@@ -49,6 +47,23 @@ compose_up() {
 
   echo "Docker Compose is not available" >&2
   exit 1
+}
+
+compose_down() {
+  if docker compose version >/dev/null 2>&1; then
+    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down --remove-orphans || true
+    return
+  fi
+
+  if command -v docker-compose >/dev/null 2>&1; then
+    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down --remove-orphans || true
+    return
+  fi
+
+  if command -v podman-compose >/dev/null 2>&1; then
+    podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down || true
+    return
+  fi
 }
 
 ensure_container_runtime() {
@@ -107,14 +122,6 @@ fi
 ensure_container_runtime
 ensure_swap
 
-if [ -n "$APP_IMAGE_ARCHIVE" ] && [ -f "$APP_IMAGE_ARCHIVE" ]; then
-  if command -v podman >/dev/null 2>&1; then
-    podman load -i "$APP_IMAGE_ARCHIVE"
-  else
-    docker load -i "$APP_IMAGE_ARCHIVE"
-  fi
-fi
-
 if command -v systemctl >/dev/null 2>&1; then
   if systemctl list-unit-files | grep -q '^docker.service'; then
     systemctl enable docker || true
@@ -130,4 +137,19 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
+set -a
+. "$ENV_FILE"
+set +a
+
+APP_IMAGE_ARCHIVE="${APP_IMAGE_ARCHIVE:-}"
+
+if [ -n "$APP_IMAGE_ARCHIVE" ] && [ -f "$APP_IMAGE_ARCHIVE" ]; then
+  if command -v podman >/dev/null 2>&1; then
+    podman load -i "$APP_IMAGE_ARCHIVE"
+  else
+    docker load -i "$APP_IMAGE_ARCHIVE"
+  fi
+fi
+
+compose_down
 compose_up

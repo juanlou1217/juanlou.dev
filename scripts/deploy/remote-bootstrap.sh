@@ -12,6 +12,21 @@ install_package() {
   apt-get install -y "$@"
 }
 
+compose_up() {
+  if docker compose version >/dev/null 2>&1; then
+    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build --remove-orphans
+    return
+  fi
+
+  if command -v docker-compose >/dev/null 2>&1; then
+    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build --remove-orphans
+    return
+  fi
+
+  echo "Docker Compose is not available" >&2
+  exit 1
+}
+
 if ! command -v git >/dev/null 2>&1; then
   install_package git
 fi
@@ -20,7 +35,7 @@ if ! command -v curl >/dev/null 2>&1; then
   install_package curl
 fi
 
-if ! command -v docker >/dev/null 2>&1; then
+if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>&1; then
   curl -fsSL https://get.docker.com | sh
 fi
 
@@ -37,4 +52,4 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
-docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build --remove-orphans
+compose_up

@@ -9,7 +9,10 @@ import { CommentsProps, GiscusConfigs } from '@/types/index';
 export default function Comments(props: CommentsProps) {
   const { configs, className } = props;
 
-  const defaultConfigs = SITE_METADATA.comments.giscusConfig as GiscusConfigs;
+  const defaultConfigs = SITE_METADATA.comments?.giscusConfig as GiscusConfigs | undefined;
+  if (!defaultConfigs) {
+    return null;
+  }
   const {
     themeURL,
     theme,

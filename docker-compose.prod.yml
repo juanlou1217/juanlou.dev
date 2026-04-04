@@ -18,7 +18,7 @@ services:
       - postgres
 
   postgres:
-    image: postgres:16-alpine
+    image: docker.m.daocloud.io/library/postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
 
   caddy:
-    image: caddy:2.10-alpine
+    image: docker.m.daocloud.io/library/caddy:2.10-alpine
     depends_on:
       - app
     environment:

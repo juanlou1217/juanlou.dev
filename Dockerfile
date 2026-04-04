@@ -1,5 +1,7 @@
+ARG NODE_IMAGE=docker.m.daocloud.io/library/node:24-alpine
+
 # Stage 1: Dependencies
-FROM node:24-alpine AS deps
+FROM ${NODE_IMAGE} AS deps
 
 # Install pnpm globally
 RUN corepack enable && corepack prepare pnpm@10.25.0 --activate
@@ -24,7 +26,7 @@ ENV POSTGRES_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
-FROM node:24-alpine AS builder
+FROM ${NODE_IMAGE} AS builder
 
 # Install pnpm globally
 RUN corepack enable && corepack prepare pnpm@10.25.0 --activate
@@ -49,7 +51,7 @@ RUN pnpm prisma:generate
 RUN pnpm build
 
 # Stage 3: Runner
-FROM node:24-alpine AS runner
+FROM ${NODE_IMAGE} AS runner
 
 WORKDIR /app
 

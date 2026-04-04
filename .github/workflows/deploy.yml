@@ -14,6 +14,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     env:
       DEPLOY_HOST: ${{ secrets.PROD_HOST }}
       DEPLOY_USER: ${{ secrets.PROD_USER }}
@@ -23,6 +25,8 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
       POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+      APP_IMAGE: localhost/juanlou-dev_app:latest
+      APP_IMAGE_ARCHIVE: app-image.tar
       GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
       NEXT_PUBLIC_GISCUS_REPO: ${{ secrets.NEXT_PUBLIC_GISCUS_REPO }}
       NEXT_PUBLIC_GISCUS_REPOSITORY_ID: ${{ secrets.NEXT_PUBLIC_GISCUS_REPOSITORY_ID }}
@@ -46,6 +50,11 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
+      - name: Build production image
+        run: |
+          docker build -t "$APP_IMAGE" .
+          docker save "$APP_IMAGE" -o "$APP_IMAGE_ARCHIVE"
+
       - name: Deploy to server
         run: |
           DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
@@ -59,7 +68,13 @@ jobs:
             set -euo pipefail
             export DEBIAN_FRONTEND=noninteractive
             if ! command -v git >/dev/null 2>&1; then
-              apt-get update && apt-get install -y git
+              if command -v apt-get >/dev/null 2>&1; then
+                apt-get update && apt-get install -y git
+              elif command -v dnf >/dev/null 2>&1; then
+                dnf install -y git
+              else
+                yum install -y git
+              fi
             fi
             mkdir -p '$DEPLOY_PATH'
             if [ ! -d '$DEPLOY_PATH/.git' ]; then
@@ -71,12 +86,16 @@ jobs:
             git reset --hard origin/main
           "
 
+          scp "$APP_IMAGE_ARCHIVE" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/$APP_IMAGE_ARCHIVE"
+
           ssh "$DEPLOY_USER@$DEPLOY_HOST" "cat > '$DEPLOY_PATH/.env.production'" <<EOF
           SITE_DOMAIN=$SITE_DOMAIN
           POSTGRES_USER=$POSTGRES_USER
           POSTGRES_PASSWORD=$POSTGRES_PASSWORD
           POSTGRES_DB=$POSTGRES_DB
           POSTGRES_URL=$POSTGRES_URL
+          APP_IMAGE=$APP_IMAGE
+          APP_IMAGE_ARCHIVE=$DEPLOY_PATH/$APP_IMAGE_ARCHIVE
           GITHUB_API_TOKEN=$GITHUB_API_TOKEN
           NEXT_PUBLIC_GISCUS_REPO=$NEXT_PUBLIC_GISCUS_REPO
           NEXT_PUBLIC_GISCUS_REPOSITORY_ID=$NEXT_PUBLIC_GISCUS_REPOSITORY_ID

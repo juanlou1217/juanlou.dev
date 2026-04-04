@@ -6,6 +6,7 @@ COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.prod.yml}"
 ENV_FILE="${ENV_FILE:-.env.production}"
 SWAPFILE_PATH="${SWAPFILE_PATH:-/swapfile}"
 SWAPFILE_SIZE="${SWAPFILE_SIZE:-4G}"
+APP_IMAGE_ARCHIVE="${APP_IMAGE_ARCHIVE:-}"
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -32,17 +33,17 @@ install_package() {
 
 compose_up() {
   if docker compose version >/dev/null 2>&1; then
-    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build --remove-orphans
+    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans
     return
   fi
 
   if command -v docker-compose >/dev/null 2>&1; then
-    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build --remove-orphans
+    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans
     return
   fi
 
   if command -v podman-compose >/dev/null 2>&1; then
-    podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build
+    podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d
     return
   fi
 
@@ -105,6 +106,14 @@ fi
 
 ensure_container_runtime
 ensure_swap
+
+if [ -n "$APP_IMAGE_ARCHIVE" ] && [ -f "$APP_IMAGE_ARCHIVE" ]; then
+  if command -v podman >/dev/null 2>&1; then
+    podman load -i "$APP_IMAGE_ARCHIVE"
+  else
+    docker load -i "$APP_IMAGE_ARCHIVE"
+  fi
+fi
 
 if command -v systemctl >/dev/null 2>&1; then
   if systemctl list-unit-files | grep -q '^docker.service'; then

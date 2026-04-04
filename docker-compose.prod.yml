@@ -1,9 +1,6 @@
 services:
   app:
-    image: localhost/juanlou-dev_app:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ${APP_IMAGE:-localhost/juanlou-dev_app:latest}
     environment:
       POSTGRES_URL: ${POSTGRES_URL:-postgresql://postgres:postgres@postgres:5432/juanlou_blog}
       GITHUB_API_TOKEN: ${GITHUB_API_TOKEN:-}

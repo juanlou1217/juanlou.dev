@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Clock, Github, MapPin, Star } from 'lucide-react';
 import useSWR from 'swr';
 
@@ -31,12 +32,24 @@ function getTime() {
 }
 
 const FooterMeta: React.FC = () => {
-  const { time, diff } = getTime();
+  const [timeInfo, setTimeInfo] = useState<{ time: string; diff: string } | null>(null);
 
   const siteRepo = SITE_METADATA.siteRepo.replace('https://github.com/', '');
   const repoName = siteRepo.split('/')[1];
 
   const { data: repo } = useSWR<GithubRepository>(`/api/github?repo=${siteRepo}`, fetcher);
+
+  useEffect(() => {
+    const updateTime = () => setTimeInfo(getTime());
+
+    updateTime();
+
+    const intervalId = window.setInterval(updateTime, 60_000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   return (
     <div className="space-y-2 py-1.5 text-gray-800 dark:text-gray-200">
@@ -61,7 +74,15 @@ const FooterMeta: React.FC = () => {
         <Clock className="h-5 w-5" />
         <Link href={TIME_IS}>
           <GrowingUnderline className="font-medium" data-umami-event="footer-time">
-            {time} <span className="text-gray-500 dark:text-gray-400">- {diff}</span>
+            {timeInfo ? (
+              <>
+                {timeInfo.time} <span className="text-gray-500 dark:text-gray-400">- {timeInfo.diff}</span>
+              </>
+            ) : (
+              <>
+                --:-- <span className="text-gray-500 dark:text-gray-400">- 加载中</span>
+              </>
+            )}
           </GrowingUnderline>
         </Link>
       </div>

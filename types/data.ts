@@ -17,7 +17,7 @@ export type GithubRepositoryCommit = {
   committedDate: string;
   message: string;
   url: string;
-  status: {
+  status?: {
     state: CommitState;
   };
 };

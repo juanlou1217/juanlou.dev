@@ -27,6 +27,81 @@ const HISTORY_QUERY = `
   }
 `;
 
+type GithubRestRepo = {
+  description: string | null;
+  fork_count: number;
+  full_name: string;
+  homepage: string | null;
+  name: string;
+  owner: {
+    avatar_url: string;
+    html_url: string;
+    login: string;
+  };
+  stargazers_count: number;
+  html_url: string;
+};
+
+type GithubRestCommit = {
+  sha: string;
+  html_url: string;
+  commit: {
+    author: {
+      date: string;
+    };
+    message: string;
+  };
+};
+
+async function fetchPublicRepoData(owner: string, name: string): Promise<GithubRepository | null> {
+  const headers = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'juanlou.dev',
+  };
+
+  const [repoResponse, commitResponse] = await Promise.all([
+    fetch(`https://api.github.com/repos/${owner}/${name}`, { headers, next: { revalidate: 300 } }),
+    fetch(`https://api.github.com/repos/${owner}/${name}/commits?per_page=1`, { headers, next: { revalidate: 300 } }),
+  ]);
+
+  if (!repoResponse.ok || !commitResponse.ok) {
+    return null;
+  }
+
+  const repository = (await repoResponse.json()) as GithubRestRepo;
+  const commits = (await commitResponse.json()) as GithubRestCommit[];
+  const lastCommit = commits[0];
+
+  return {
+    stargazerCount: repository.stargazers_count,
+    description: repository.description ?? '',
+    homepageUrl: repository.homepage ?? '',
+    languages: [],
+    name: repository.name,
+    nameWithOwner: repository.full_name,
+    url: repository.html_url,
+    forkCount: repository.fork_count,
+    repositoryTopics: [],
+    owner: {
+      avatarUrl: repository.owner.avatar_url,
+      login: repository.owner.login,
+      url: repository.owner.html_url,
+    },
+    lastCommit: lastCommit
+      ? {
+          id: lastCommit.sha,
+          abbreviatedOid: lastCommit.sha.slice(0, 7),
+          committedDate: lastCommit.commit.author.date,
+          message: lastCommit.commit.message,
+          url: lastCommit.html_url,
+          status: {
+            state: 'EXPECTED',
+          },
+        }
+      : undefined,
+  };
+}
+
 export async function fetchRepoData({
   repo = '',
   includeLastCommit = false,
@@ -34,9 +109,18 @@ export async function fetchRepoData({
   repo: string;
   includeLastCommit?: boolean;
 }): Promise<GithubRepository | null> {
-  if (!process.env.GITHUB_API_TOKEN || !repo) {
-    console.error('Missing `GITHUB_API_TOKEN` or `repo`');
+  if (!repo) {
     return null;
+  }
+
+  const [owner, name] = repo.split('/');
+
+  if (!owner || !name) {
+    return null;
+  }
+
+  if (!process.env.GITHUB_API_TOKEN) {
+    return fetchPublicRepoData(owner, name);
   }
 
   try {
@@ -78,8 +162,8 @@ export async function fetchRepoData({
         }
       `,
       {
-        owner: repo.split('/')[0],
-        repo: repo.split('/')[1],
+        owner,
+        repo: name,
         headers: {
           authorization: `token ${process.env.GITHUB_API_TOKEN}`,
         },

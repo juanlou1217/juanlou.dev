@@ -19,7 +19,7 @@ A module is a class annotated with a `@Module()` decorator. The `@Module()` deco
 - In **NestJS** modules are strongly recommended as an effective way to organize your components.
 - Each module will encapsulate a set of closely related functions.
 
-![Diagram Module In NestJS](/static/images/blogs/module-in-nestjs.png)
+![Diagram Module In NestJS](/static/images/blogs/module-in-nestjs.svg)
 
 The decorator `@Module()` takes a single object whose properties describe the module:
 
@@ -87,7 +87,7 @@ export class AppModule {}
 
 - Every module is automatically a **shared module**.
 
-![Diagram Shared Module In NestJS](/static/images/blogs/shared-module.png)
+![Diagram Shared Module In NestJS](/static/images/blogs/shared-module.svg)
 
 ```ts:core/logger/logger.module.ts showLineNumbers
 import { Module } from '@nestjs/common';
@@ -129,7 +129,7 @@ export class ProductModule {}
 
 - This approach significantly reduces redundancy and promotes a more efficient and maintainable code structure.
 
-![Diagram Global Module In NestJS](/static/images/blogs/global-module.png)
+![Diagram Global Module In NestJS](/static/images/blogs/global-module.svg)
 
 - `@Global()` decorator make the module global, that you want to provide a set of providers which should be available everywhere:
 

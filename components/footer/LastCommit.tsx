@@ -30,7 +30,7 @@ export function LastCommit() {
   );
 }
 
-function CommitStatus({ status }: { status: CommitState }) {
+function CommitStatus({ status }: { status?: CommitState }) {
   switch (status) {
     case 'EXPECTED':
     case 'SUCCESS':

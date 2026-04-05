@@ -18,6 +18,7 @@
 - `components/ui/Button.tsx`
 - `components/ui/Link.tsx`
 - `components/ui/Image.tsx`
+- 博客 MDX 中的 Excalidraw 图表优先复用 `components/ui/ExcalidrawFigure.tsx`
 - `components/ui/PageTitle.tsx`
 - `components/ui/Container.tsx`
 - `components/ui/SectionContainer.tsx`

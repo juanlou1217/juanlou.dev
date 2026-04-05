@@ -13,6 +13,7 @@
     "vercel-build": "bash build.sh",
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
+    "excalidraw:new": "node scripts/excalidraw-scaffold.mjs",
     "lint": "eslint --fix",
     "prisma:generate": "prisma generate && node scripts/postgenerate.mjs",
     "prisma:migrate": "prisma migrate dev",

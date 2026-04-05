@@ -31,6 +31,8 @@
   Giscus 评论封装。
 - `Tag.tsx`
   标签链接渲染。
+- `ExcalidrawFigure.tsx`
+  博客 MDX 中的 Excalidraw 手绘图统一展示入口，负责图片渲染、图注和源文件下载链接。
 - `ScrollTopAndComment.tsx`
   文章页右下角滚动与评论定位入口。
 - `MDXComponents.tsx`

@@ -4,9 +4,11 @@ import type { MDXComponents } from 'mdx/types';
 
 import Link from '@/components/ui/Link';
 import TableWrapper from '@/components/ui/TableWrapper';
+import ExcalidrawFigure from '@/components/ui/ExcalidrawFigure';
 import Image from '@/components/ui/Image';
 
 const components: MDXComponents = {
+  ExcalidrawFigure,
   Image,
   TOCInline,
   a: Link,

@@ -6,6 +6,7 @@ import Image from './Image';
 import Button from './Button';
 import Twemoji from './Twemoji';
 import Comments from './Comments';
+import ExcalidrawFigure from './ExcalidrawFigure';
 import BrandIcon from './BrandIcon';
 import PageTitle from './PageTitle';
 import TableWrapper from './TableWrapper';
@@ -23,6 +24,7 @@ export {
   Zoom,
   Image,
   Button,
+  ExcalidrawFigure,
   Twemoji,
   Comments,
   BrandIcon,

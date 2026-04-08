@@ -13,7 +13,8 @@
 - `/` 首页
 - `/blog` 文章列表
 - `/blog/[...slug]` 文章详情
-- `/blog/tech`、`/blog/life`、`/blog/essay` 分类列表
+- `/blog/tech`、`/blog/life` 分类列表
+- `/blog/essay` 随笔记录流
 - `/tags` 与 `/tags/[tag]`
 - `/about`
 - `/lab` 占位页
@@ -75,8 +76,10 @@
 本仓库的页面实现有明确倾向：
 
 - 文章列表页优先复用 `layouts/ListLayout.tsx`
+- 随笔列表页优先复用 `layouts/EssayTimelineLayout.tsx`，表达为内容优先的记录流
 - 标签侧边栏列表才考虑 `layouts/ListLayoutWithTags.tsx`
-- 文章详情优先走 `layouts/PostLayout.tsx`、`layouts/PostSimple.tsx`、`layouts/PostBanner.tsx`
+- 普通文章详情优先走 `layouts/PostLayout.tsx`、`layouts/PostSimple.tsx`、`layouts/PostBanner.tsx`
+- 随笔详情优先走 `layouts/EssayLayout.tsx`
 - SEO metadata 优先走 `lib/seo.ts`
 
 如果一个功能能通过补齐现有 layout 或 util 解决，不应新起一套 page-local 逻辑。

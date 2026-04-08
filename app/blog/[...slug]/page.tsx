@@ -10,11 +10,12 @@ import { sortPosts, coreContent, allCoreContent } from 'pliny/utils/contentlayer
 
 import components from '@/components/ui/MDXComponents';
 import siteMetadata from '@/data/siteMetadata';
-import { getPublishedBlogs } from '@/lib/content';
-import { PostSimple, PostLayout, PostBanner } from 'layouts';
+import { getEssayBlogs, getPublishedBlogs, isEssayBlog } from '@/lib/content';
+import { EssayLayout, PostSimple, PostLayout, PostBanner } from 'layouts';
 
 const defaultLayout = 'PostLayout';
 const layouts = {
+  EssayLayout,
   PostSimple,
   PostLayout,
   PostBanner,
@@ -80,7 +81,13 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   const params = await props.params;
   const slug = decodeURI(params.slug.join('/'));
   const publishedBlogs = getPublishedBlogs();
-  const sortedCoreContents = allCoreContent(sortPosts(publishedBlogs));
+  const post = publishedBlogs.find((p) => p.slug === slug) as Blog;
+  if (!post) {
+    return notFound();
+  }
+
+  const siblingBlogs = isEssayBlog(post) ? getEssayBlogs() : publishedBlogs;
+  const sortedCoreContents = allCoreContent(sortPosts(siblingBlogs));
   const postIndex = sortedCoreContents.findIndex((p) => p.slug === slug);
   if (postIndex === -1) {
     return notFound();
@@ -88,7 +95,6 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   const prev = sortedCoreContents[postIndex + 1];
   const next = sortedCoreContents[postIndex - 1];
-  const post = publishedBlogs.find((p) => p.slug === slug) as Blog;
   const authorList = post?.authors || ['default'];
   const authorDetails = authorList.map((author) => {
     const authorResults = allAuthors.find((p) => p.slug === author);
@@ -103,7 +109,8 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
     };
   });
 
-  const Layout = layouts[post.layout || defaultLayout];
+  const layoutKey = isEssayBlog(post) ? 'EssayLayout' : post.layout || defaultLayout;
+  const Layout = layouts[layoutKey];
 
   return (
     <>

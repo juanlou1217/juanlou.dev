@@ -1,10 +1,10 @@
-import ListLayout from '@/layouts/ListLayout';
 import { notFound } from 'next/navigation';
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer';
-import { getBlogsByCategory, getPageNumber, getTotalPages, isPageOutOfRange, POSTS_PER_PAGE } from '@/lib/content';
+import { sortPosts } from 'pliny/utils/contentlayer';
+import { EssayTimelineLayout } from 'layouts';
+import { getEssayBlogs, getPageNumber, getTotalPages, isPageOutOfRange, POSTS_PER_PAGE } from '@/lib/content';
 
 export const generateStaticParams = async () => {
-  const totalPages = getTotalPages(getBlogsByCategory('essay').length, POSTS_PER_PAGE);
+  const totalPages = getTotalPages(getEssayBlogs().length, POSTS_PER_PAGE);
   const paths = Array.from({ length: totalPages }, (_, i) => ({ page: (i + 1).toString() }));
 
   return paths;
@@ -12,7 +12,7 @@ export const generateStaticParams = async () => {
 
 export default async function EssayPagePagination(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
-  const posts = allCoreContent(sortPosts(getBlogsByCategory('essay')));
+  const posts = sortPosts(getEssayBlogs());
   const pageNumber = getPageNumber(params.page);
   const totalPages = getTotalPages(posts.length, POSTS_PER_PAGE);
 
@@ -27,5 +27,12 @@ export default async function EssayPagePagination(props: { params: Promise<{ pag
     basePath: '/blog/essay',
   };
 
-  return <ListLayout posts={posts} initialDisplayPosts={initialDisplayPosts} pagination={pagination} title="随笔" />;
+  return (
+    <EssayTimelineLayout
+      posts={posts}
+      initialDisplayPosts={initialDisplayPosts}
+      pagination={pagination}
+      title="随笔时间线"
+    />
+  );
 }

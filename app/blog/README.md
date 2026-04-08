@@ -16,12 +16,12 @@ app/blog/
 │       └── [page]/
 │           └── page.tsx  # 生活感悟分页 (/blog/life/page/[page])
 ├── essay/
-│   ├── page.tsx          # 随笔列表页 (/blog/essay)
+│   ├── page.tsx          # 随笔记录流页 (/blog/essay)
 │   └── page/
 │       └── [page]/
-│           └── page.tsx  # 随笔分页 (/blog/essay/page/[page])
+│           └── page.tsx  # 随笔记录流分页 (/blog/essay/page/[page])
 ├── [...slug]/
-│   └── page.tsx          # 文章详情页 (/blog/[slug])
+│   └── page.tsx          # 文章/随笔详情页 (/blog/[slug])
 └── page/
     └── [page]/
         └── page.tsx      # 所有文章分页 (/blog/page/[page])
@@ -49,13 +49,15 @@ app/blog/
 
 #### 随笔 (`/blog/essay`)
 - 文件：`essay/page.tsx`
-- 功能：只显示 `category: 'essay'` 的文章
+- 功能：直接展开 `category: 'essay'` 的内容，按时间倒序显示
+- 表达：更接近评论区 / 动态流，而不是博客卡片
 - 适用：短篇随笔、日常记录、碎片化思考
 
 ### 3. 文章详情页 (`/blog/[...slug]`)
 - 文件：`[...slug]/page.tsx`
-- 功能：显示单篇文章的完整内容
-- 支持：MDX 渲染、代码高亮、目录导航
+- 功能：显示单篇文章或单条随笔的完整内容
+- 差异：普通文章走博客布局，`essay` 自动走随笔详情布局
+- 支持：MDX 渲染、评论、统计、详情展开
 
 ### 4. 分页页面
 
@@ -75,7 +77,7 @@ app/blog/
   - 文件：`life/page/[page]/page.tsx`
   - 示例：`/blog/life/page/2`
 
-- 随笔分页：`/blog/essay/page/[page]`
+- 随笔记录流分页：`/blog/essay/page/[page]`
   - 文件：`essay/page/[page]/page.tsx`
   - 示例：`/blog/essay/page/2`
 

@@ -7,8 +7,16 @@ export function getPublishedBlogs(): Blog[] {
   return allBlogs.filter((post) => !post.draft);
 }
 
+export function isEssayBlog(post: Pick<Blog, 'category' | 'tags'>) {
+  return post.category === 'essay' || post.tags?.includes('essay');
+}
+
 export function getBlogsByCategory(category: Blog['category']): Blog[] {
   return getPublishedBlogs().filter((post) => post.category === category || post.tags?.includes(category));
+}
+
+export function getEssayBlogs(): Blog[] {
+  return getPublishedBlogs().filter((post) => isEssayBlog(post));
 }
 
 export function getBlogsByTag(tag: string): Blog[] {

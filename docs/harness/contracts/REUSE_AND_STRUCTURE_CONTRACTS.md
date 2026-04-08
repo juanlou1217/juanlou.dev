@@ -47,6 +47,14 @@
 
 如果分页、搜索、排序或空状态的需求能通过补齐现有 layout 解决，不应重新创建新的列表 layout。
 
+### 随笔记录流
+
+`/blog/essay` 不是普通博客卡片列表，默认应复用：
+
+- `layouts/EssayTimelineLayout.tsx`
+
+如果需求是“像评论流一样快速扫读随笔内容”，不应回退到 `ListLayout.tsx`。
+
 ### 博客详情
 
 博客详情页必须复用以下布局之一：
@@ -56,6 +64,12 @@
 - `layouts/PostBanner.tsx`
 
 不应在 `app/blog/[...slug]/page.tsx` 中直接堆叠新的详情结构。
+
+随笔详情默认应复用：
+
+- `layouts/EssayLayout.tsx`
+
+如果内容属于 `essay`，不应继续按普通文章详情头图/目录模型表达。
 
 ## 3. 数据来源契约
 

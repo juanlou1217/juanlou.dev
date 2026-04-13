@@ -1,5 +1,11 @@
+{
+  servers :443 {
+    protocols h1
+  }
+}
+
 {$SITE_DOMAIN} {
-  encode zstd gzip
+  encode gzip
 
   header {
     Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
@@ -8,5 +14,10 @@
     Referrer-Policy "strict-origin-when-cross-origin"
   }
 
-  reverse_proxy app:3000
+  reverse_proxy app:3000 {
+    header_down -Referrer-Policy
+    header_down -Strict-Transport-Security
+    header_down -X-Content-Type-Options
+    header_down -X-Frame-Options
+  }
 }

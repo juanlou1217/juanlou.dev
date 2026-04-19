@@ -85,6 +85,7 @@ Preserve:
 - the original thesis
 - factual claims that match the repo
 - frontmatter shape unless there is a clear issue
+- the author's existing rhythm, warmth, jokes, and small imperfect phrases when they already feel natural
 
 Improve:
 
@@ -93,6 +94,8 @@ Improve:
 - paragraph rhythm
 - heading hierarchy
 - readability for the intended audience
+
+Use a light-touch editing mode by default. Do not paste the newest personality summary, insight, or framework directly onto an existing article, homepage, or about page. Start from what is already working, then make small repairs, bridge transitions, trim rough repetition, and add only the missing detail that helps the original voice land better.
 
 ## Author voice and style adaptation
 
@@ -142,6 +145,8 @@ When a style profile exists, extract and respect:
 - visual and structural taste when describing projects or page sections
 
 Do not flatten the output into a generic “good technical article” if the style profile asks for something more personal or more opinionated.
+
+When updating existing personal copy, treat the current page or article as the source of truth for tone. The goal is not to overwrite it with a fresher summary of the author, but to let the author's newer understanding grow out of the old wording naturally. Prefer small sentence-level edits over full-section replacement unless the user explicitly asks for a rewrite.
 
 ## Writing workflow
 

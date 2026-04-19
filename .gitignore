@@ -51,6 +51,9 @@ yarn-error.log*
 # Contentlayer
 .contentlayer
 
+# local writing/persona profiles
+/docs/style/
+
 # TypeScript
 tsconfig.tsbuildinfo
 

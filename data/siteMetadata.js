@@ -10,7 +10,7 @@ const siteMetadata = {
   author: '卷娄',
   fullName: '赵康',
   headerTitle: '卷娄的折腾日记',
-  description: '一位迷茫的折腾日记，分享代码，也写生活。知其卷娄之患，故守其不卷不娄之身。',
+  description: '一个年轻工程师的技术、生活和成长记录。写代码，也写自己如何思考、探索和慢慢变清楚。',
   language: 'zh-CN',
   theme: 'system',
   siteUrl: 'https://juanlou.top',

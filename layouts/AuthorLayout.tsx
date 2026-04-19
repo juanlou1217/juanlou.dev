@@ -24,7 +24,7 @@ export default function AuthorLayout({ children, content }: Props) {
             关于
           </h1>
           <p className="text-base text-gray-500 md:text-lg md:leading-7 dark:text-gray-400">
-            进一步了解我是谁以及这个博客的目的。
+            这里不是一份完美简历，而是我如何学习、表达、做项目，以及为什么持续写下来的说明。
           </p>
         </div>
 

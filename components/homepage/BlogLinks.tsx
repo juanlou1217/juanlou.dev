@@ -18,7 +18,7 @@ const BlogLinks = () => {
           <Twemoji emoji="seedling" />
           <GrowingUnderline>
             <span data-umami-event="home-link-life" className="ml-1.5">
-              生活中的思考 ～听听我的成长烦恼😎
+              生活感悟 ～记录成长里的真实变化😎
             </span>
           </GrowingUnderline>
         </Link>
@@ -27,7 +27,7 @@ const BlogLinks = () => {
           <GrowingUnderline>
             {' '}
             <span data-umami-event="home-link-essay" className="ml-1.5">
-              随手写点什么 ～随时报备哦🥰
+              随笔记录 ～把当下的想法先留下✌️
             </span>
           </GrowingUnderline>
         </Link>
@@ -35,7 +35,7 @@ const BlogLinks = () => {
           <Twemoji emoji="test-tube" />
           <GrowingUnderline>
             <span data-umami-event="home-link-lab" className="ml-1.5">
-              我的实验室 ～奇妙小想法💭
+              实验室 ～放一些还在探索的小想法💭
             </span>
           </GrowingUnderline>
         </Link>

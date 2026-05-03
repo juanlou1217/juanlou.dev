@@ -97,6 +97,8 @@ Improve:
 
 Use a light-touch editing mode by default. Do not paste the newest personality summary, insight, or framework directly onto an existing article, homepage, or about page. Start from what is already working, then make small repairs, bridge transitions, trim rough repetition, and add only the missing detail that helps the original voice land better.
 
+For personal reflection posts, especially when the source is a raw voice-note-like dump, do not over-sanitize the writing into a neat essay. The goal is not to convert the author into a formal columnist. Preserve the author's live thinking: the surprise, embarrassment, excitement, self-correction, unfinished phrasing, and sudden but meaningful leaps. Improve structure around that energy instead of replacing it.
+
 ## Author voice and style adaptation
 
 First follow the resolved style profile. Use the rules below as the fallback baseline when the profile is missing or incomplete.
@@ -147,6 +149,82 @@ When a style profile exists, extract and respect:
 Do not flatten the output into a generic “good technical article” if the style profile asks for something more personal or more opinionated.
 
 When updating existing personal copy, treat the current page or article as the source of truth for tone. The goal is not to overwrite it with a fresher summary of the author, but to let the author's newer understanding grow out of the old wording naturally. Prefer small sentence-level edits over full-section replacement unless the user explicitly asks for a rewrite.
+
+## Personal reflection writing
+
+Use this section when writing or revising life/work/growth reflection posts from the author's spoken notes.
+
+### Core goal
+
+Create an article that has:
+
+- a clear main thread
+- readable heading hierarchy
+- preserved personal tone and emotional color
+- enough raw life and thought-energy that it still feels like the author
+
+Do not optimize only for smoothness. A piece can be structurally clear while still sounding alive.
+
+### Preserve the author's live voice
+
+When source notes contain vivid or emotionally specific lines, keep them unless they truly break readability. These lines often carry the author's real voice better than polished summaries.
+
+Preserve lines like:
+
+- “大家真的都好牛”
+- “我还是有点拘谨”
+- “想到自己和这么厉害的人在一个公司里工作，会觉得这件事本身就很厉害”
+- “我不是没有想法，而是想法拆不细”
+- “我经常在开口之前就把自己按住了”
+
+You may clean obvious speech artifacts, but do not remove the feeling underneath. Keep some first-person hesitations, self-corrections, and emotionally loaded observations when they reveal the author's real state.
+
+Avoid replacing vivid lines with colder abstractions:
+
+- Bad: “我感受到组织中存在高水平人才密度。”
+- Better: “看到公司里这么多厉害的人，我一方面觉得很兴奋，另一方面也会更拘谨。”
+
+### Structure without killing energy
+
+Use headings to guide the reader, not to turn every paragraph into a thesis statement.
+
+For reflective posts, prefer a three-level rhythm:
+
+1. Main route: 2 to 4 large sections that explain the movement of thought
+2. Local anchors: smaller headings that clarify subtopics
+3. Voice paragraphs: personal, sensory, emotional, or slightly messy paragraphs that keep the article alive
+
+Good large-section routes include:
+
+- `自我 -> 环境 -> 破局`
+- `感受 -> 反思 -> 行动`
+- `现象 -> 问题 -> 方法`
+- `聊天内容 -> 我的理解 -> 下周行动`
+
+Do not make every `##` a climax. Use `##` for the main route and `###` for supporting ideas. If every heading sounds like a final lesson, the article becomes tiring.
+
+### Keep hierarchy of importance
+
+Before rewriting, identify:
+
+- the central emotional trigger
+- the main self-recognition
+- the external framework or company/business insight
+- the actual next action
+
+Then decide which parts deserve expansion. Do not spend equal length on every minor idea. If the user says a section is secondary, keep it as support rather than turning it into the article's center.
+
+### Work from raw notes carefully
+
+When processing a long spoken note:
+
+1. Extract the user's original emotional peaks and keep representative wording.
+2. Identify the article route in one sentence.
+3. Group ideas under the route before polishing sentence-level details.
+4. Preserve at least several original-feeling sentences in each major section.
+5. Only then smooth transitions and remove repetition.
+
+If a rewrite becomes too clean, add back concrete moments, names, scenes, and personal reactions from the source notes.
 
 ## Writing workflow
 

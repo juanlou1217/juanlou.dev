@@ -16,6 +16,9 @@
   "blog": 1,
   "hangzhou": 3,
   "growth": 5,
+  "hospital": 1,
+  "flu": 1,
+  "daily": 2,
   "reflection": 4,
   "food": 1,
   "jobright": 1,
@@ -25,7 +28,6 @@
   "choice": 1,
   "ownership": 1,
   "rain": 2,
-  "daily": 1,
   "memory": 1,
   "home": 1
 }

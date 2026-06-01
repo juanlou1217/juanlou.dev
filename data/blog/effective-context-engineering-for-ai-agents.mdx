@@ -1,0 +1,411 @@
+---
+title: 'Effective Context Engineering for AI Agents'
+date: '2026-05-24'
+lastmod: '2026-05-31'
+tags: ['agent', 'agent-learning', 'anthropic', 'context-engineering', 'reading']
+category: 'tech'
+draft: false
+summary: '这篇笔记整理了 context engineering 的核心概念：它不是单纯写 prompt，而是为 agent 设计一套信息供应链。'
+authors: ['default']
+layout: 'PostLayout'
+canonicalUrl: 'https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents'
+---
+
+# Effective Context Engineering for AI Agents
+
+## 链接
+
+[Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+
+## 一句话结论
+
+Context engineering 不是单纯“写好 prompt”，而是为 agent 设计一套信息供应链：哪些信息常驻，哪些信息预处理，哪些信息按需检索，哪些信息压缩，哪些信息写入外部状态，哪些信息交给子 agent 隔离处理。
+
+> [!summary]
+> Prompt engineering 关注“怎么写输入”；context engineering 关注“每一轮模型行动前，应该让模型看见什么”。
+
+## 初读关注点与答案
+
+- context engineering 的核心问题是什么？
+  - 在有限 context window 中，让模型看到当前任务最相关、最高信号、最低噪音的信息。
+- 它和 prompt engineering、memory、RAG、tool use 的边界分别是什么？
+  - Prompt engineering 是其中一部分；memory、RAG、tool use 都是 context 来源或管理手段。
+- 文章提出了哪些可操作的 context 管理方法？
+  - 系统提示词设计、工具描述设计、few-shot examples、检索/RAG、just-in-time context、compaction、structured notes、sub-agent。
+- 对自己的知识管理、AI 协作、agent 工作流有什么启发？
+  - 需要为 AI 准备导航层、项目地图、外部工作状态，而不是只把资料堆给模型。
+
+## 文章骨架
+
+### 1. 从 Prompt Engineering 到 Context Engineering
+
+传统 prompt engineering 更像：
+
+```text
+system prompt + user message -> LLM -> assistant message
+```
+
+它适合单轮问题，重点是系统提示词和用户提示词怎么写。
+
+Context engineering 面向 agent，更像：
+
+```text
+system prompt / user input / message history / tool definitions
+/ tool results / docs / memory / external state
+        |
+        v
+selection + retrieval + compression + ordering + structuring
+        |
+        v
+context window
+        |
+        v
+LLM -> assistant message or tool call
+        |
+        v
+new results flow back into history / memory / external state
+```
+
+这里的关键不是“资料多”，而是每一轮 agent 行动前做一次上下文编排。
+
+### 2. 为什么 Context 是有限资源
+
+LLM 生成时基于当前 context window 中的 token。Transformer 会让 token 参考上下文中其他 token 的信息。上下文太长、太杂、互相冲突时，模型仍然能生成，但更难稳定抓住真正相关的线索。
+
+可以理解为：
+
+- 信息太少：模型缺依据，容易猜。
+- 信息太多：信号噪声比下降，注意力被稀释。
+- 信息冲突：模型可能跟错线索。
+- 历史太长：早期目标被后续局部任务冲淡。
+
+> [!important]
+> “广度影响深度”可以作为直觉理解，但更精确的说法是：过长、过杂、冲突的上下文会降低有效推理质量。
+
+### 3. 什么是有效 Context
+
+有效 context 不是越全越好，而是足够支持当前决策，同时尽量短、准、干净。
+
+主要元素：
+
+| 元素 | 作用 | 风险 |
+| --- | --- | --- |
+| System prompt | 角色、目标、边界、工作方式 | 太硬会脆弱，太软会发散 |
+| Tools | 与外界交互、获取实时信息、执行动作 | 工具太多或描述不清会选错 |
+| Examples / few-shot | 用代表性例子表达期望行为 | 边缘例子太多会污染重心 |
+| Message history | 保留任务过程和决策 | 无限增长会稀释目标 |
+| Docs / knowledge | 提供外部依据 | 原样灌入会造成噪音 |
+| Memory / notes | 保存跨轮次、跨会话状态 | 错误记忆会长期污染 |
+
+### 4. Few-Shot Prompting
+
+Few-shot prompting 是在提示词中给少量“输入 -> 期望输出”的例子，让模型从例子中归纳行为模式。
+
+```text
+示例 1：
+输入：支付失败，影响大量用户
+输出：高优先级
+
+示例 2：
+输入：页面文案有错别字
+输出：低优先级
+
+现在判断：
+输入：用户无法上传简历
+输出：
+```
+
+好的 few-shot examples 应该是 canonical examples：
+
+- 代表性强，能体现核心判断方式。
+- 彼此有差异，覆盖主要类型。
+- 不被罕见边缘情况主导。
+- 输出格式和风格稳定。
+
+大量 edge cases 不应该全塞进 prompt。更好的分层是：
+
+| 内容类型 | 更适合放在哪里 |
+| --- | --- |
+| 行为风格、判断口径 | prompt + few-shot |
+| 复杂规则、历史案例 | 知识库 + 检索 |
+| 必须 100% 执行的约束 | 代码、校验器、测试 |
+| 大量边缘情况 | eval/test set |
+
+### 5. Retrieval 与 Embedding
+
+Embedding retrieval 解决的是“应该找哪些资料”的问题，不是直接替代上下文，也不是 compaction。
+
+```text
+用户问题
+  -> embedding 向量化
+  -> 去知识库 / 文档库 / 代码库索引里做相似度检索
+  -> 找到相关原文片段
+  -> 把原文片段放进 LLM context
+  -> LLM 阅读、推理、回答或行动
+```
+
+关键区别：
+
+- RAG embedding：给检索系统用，用来找资料。
+- LLM token embedding：模型内部把 token ID 转成向量，用来生成。
+
+> [!note]
+> Embedding 是“找资料的坐标系统”，不是“把向量直接喂给 LLM 作为答案”。
+
+### 6. Just-in-Time Context
+
+Just-in-time context 可以类比为懒加载：先加载导航层，需要时再加载正文。
+
+```text
+先知道有哪些文件、标签、模块、摘要
+  -> 根据当前任务定位相关区域
+  -> 只读取相关文件或片段
+  -> 把必要内容放进 context
+```
+
+在 coding agent 中，常见流程是：
+
+```text
+1. 读项目导航
+   README / AGENTS.md / package.json / architecture.md
+
+2. 定位入口
+   rg login / signIn / auth / Login / 登录
+
+3. 读取最相关文件
+   Login page / Login component / Button component
+
+4. 沿调用链展开
+   onClick handler -> auth hook -> API client -> route/action
+
+5. 查失败证据
+   test output / console error / network error / type error
+
+6. 修改最小范围代码
+
+7. 验证
+
+8. 失败时只把关键错误追加进 context
+```
+
+这不是压缩，而是延迟加载：
+
+```text
+compaction: 很多内容 -> 总结成短内容
+just-in-time: 先不读全部 -> 需要哪块再读哪块
+```
+
+### 7. 预处理与 Just-in-Time 的混合策略
+
+预处理是提前做好的加工：
+
+- 项目地图
+- 文档摘要
+- 向量索引
+- 标签和 frontmatter
+- API schema
+- memory file
+- 任务状态文件
+
+Just-in-time 是运行时按需读取：
+
+```text
+用户问登录问题
+  -> 查项目地图发现 auth 模块
+  -> 搜 login/signIn
+  -> 读取相关文件
+  -> 只把相关函数放入 context
+```
+
+二者关系：
+
+```text
+预处理提供导航层
+Just-in-time 根据导航层按需取正文
+```
+
+这也是 Obsidian 对 AI 友好的原因之一：文件名、frontmatter、标签、双链、目录页、摘要，都可以成为导航层。
+
+### 7.1 实例：修 Bug 时 Context 如何进入
+
+修 bug 时，真正进入本轮 context window 的，不是项目里的全部信息，而是和当前决策最相关的一小部分。
+
+可以把候选信息分成三类：
+
+| 进入方式 | 信息类型 | 作用 |
+| --- | --- | --- |
+| 常驻 | 用户 bug 描述 | 保持任务目标不漂移 |
+| 常驻 | 项目规则 / developer instruction | 保持实现方式符合项目约束 |
+| 常驻 | 当前任务计划 | 让 agent 知道现在处于哪一步 |
+| 常驻 | 已确认的关键状态 | 避免重复探索，保持判断连续性 |
+| 按需进入 | 相关代码片段 | 支持当前修改决策 |
+| 按需进入 | 测试错误 | 提供失败证据和下一步定位方向 |
+| 按需进入 | API / SQL 返回 | 说明外部系统或数据层状态 |
+| 按需进入 | 检索结果 | 补充相关文档、历史案例或代码位置 |
+| 按需进入 | 工具调用结果 | 让 agent 根据环境反馈继续决策 |
+| 压缩后进入 | 长对话历史 | 保留关键决策，去掉低价值过程 |
+| 压缩后进入 | 长期记忆 | 保留稳定偏好、项目知识和历史结论 |
+| 压缩后进入 | 多轮探索结论 | 把已查明的信息整理成可继续执行的状态 |
+
+更具体地说：
+
+```text
+常驻：
+- 用户 bug 描述
+- 项目规则 / developer instruction
+- 当前任务计划
+- 已确认的关键状态
+
+按需进入：
+- 相关代码片段
+- 测试错误
+- API 返回
+- 检索结果
+- 工具调用结果
+
+压缩后进入：
+- 长对话历史
+- 长期记忆
+- 多轮探索结论
+```
+
+这个例子能说明：RAG 检索、代码搜索、读文件、查 API、读取历史记忆，本质上都是从不同信息源取回材料；取回之后还要经过筛选、压缩、排序，才决定是否进入本轮 context。
+
+### 8. 长任务中的 Context 管理
+
+长任务里，agent 会不断产生新信息。若不管理，工具结果、历史对话、失败尝试、局部讨论会污染主上下文。
+
+文章提到三类主要策略。
+
+#### Compaction
+
+压缩当前会话历史，让同一个 agent 继续工作。
+
+```text
+长对话 / 工具日志 / 中间探索
+  -> 当前状态、已做事项、关键约束、下一步
+```
+
+风险：压缩时可能漏掉关键细节，所以需要关注 recall。
+
+#### Structured Notes
+
+把重要状态写到上下文窗口外，之后可恢复、可共享、可检索。
+
+这可以理解为 external working state：
+
+- plan state：计划和待办
+- progress state：已经完成什么
+- decision state：做过哪些决策，以及为什么
+- constraint state：不能违反的约束
+- failed-attempt state：试过什么不行
+- project-map state：项目结构和模块职责
+- open-question state：还没确认的问题
+
+Structured notes 可以包含 plan，但不等于 plan。
+
+#### Sub-Agent
+
+把局部探索交给子 agent，在干净上下文里完成任务，再把摘要返回主 agent。
+
+```text
+主 agent：负责目标、整合、最终决策
+子 agent A：查 auth 模块
+子 agent B：查测试失败原因
+子 agent C：查 UI 事件链
+主 agent：只接收精简结论
+```
+
+核心价值：隔离噪音，降低主上下文污染。
+
+## 我的理解
+
+### 当前理解
+
+我现在对 context engineering 的理解是：agent 的核心能力不只是模型本身，而是围绕模型设计一套上下文管理机制。模型每轮行动前，都需要从系统提示词、用户输入、历史消息、工具、工具结果、文档、记忆、外部状态中筛选出最适合当前任务的信息。
+
+这个过程不是“全部塞进去”，而是：
+
+```text
+候选信息很多
+  -> 筛选、检索、压缩、排序、结构化
+  -> 只让高价值信息进入 context window
+  -> 模型行动
+  -> 新信息回流
+  -> 下一轮重新编排
+```
+
+### 我已经理解较稳的点
+
+- Context 是模型生成时能看到的 token 序列，不是模型内部全部知识。
+- Context window 是有限资源，过长、过杂、冲突的上下文会降低有效推理质量。
+- Embedding retrieval 是检索机制，不是 compaction。
+- Just-in-time context 是懒加载/按需加载，不是压缩。
+- Few-shot examples 是让模型从少量代表性例子中学习行为模式。
+- Structured notes 是外部工作状态，不只是长期记忆。
+- Sub-agent 的价值是隔离上下文污染，让局部任务在干净环境中完成。
+
+### 需要继续校准的点
+
+- 避免把 token 注意力关系说成“标签点”或“特征点”，更准确应说信号噪声比、注意力稀释、上下文冲突。
+- Just-in-time 在 coding agent 中不只是读目录，而是沿入口、调用链、错误证据逐步展开。
+- Structured notes 不只是 plan，而是 plan/progress/decision/constraint/error/project map 的组合状态。
+- Few-shot 例子要同时有公共模式和差异覆盖，不是只给相似样本。
+
+## 概念区分
+
+| 概念 | 解决的问题 | 典型动作 |
+| --- | --- | --- |
+| Prompt engineering | 怎么表达任务和约束 | 写 system/user prompt |
+| Context engineering | 每轮让模型看什么 | 筛选、压缩、检索、编排 |
+| RAG / embedding retrieval | 去哪里找相关资料 | 向量化问题和文档，检索相似片段 |
+| Compaction | 历史太长怎么继续 | 总结当前状态，删去低价值过程 |
+| Structured notes | 状态如何跨轮次保存 | 写计划、进度、决策、失败尝试 |
+| Just-in-time context | 如何避免一次性读太多 | 先导航，后正文，按需读取 |
+| Sub-agent | 如何隔离复杂探索 | 子任务独立上下文，返回摘要 |
+
+## 可复用原则
+
+1. 不要把 context window 当作仓库，要把它当作工作台。
+2. 常驻信息必须少而关键，变化信息应按需读取。
+3. 工具描述要清楚，工具数量要可控。
+4. 例子比抽象规则更容易表达期望行为，但例子必须代表性强。
+5. 大量边缘情况不该塞进 prompt，应进入知识库、规则引擎、校验器或测试集。
+6. 长任务必须维护 external working state，否则上下文压缩后容易丢失方向。
+7. Coding agent 的有效上下文来自“导航层 + 搜索 + 调用链 + 错误证据”，而不是读取整个仓库。
+8. 更强的模型不代表不需要 context engineering，只是可以把更多编排工作交给模型自主完成。
+
+## 费曼检查题
+
+1. 用一句话向一个完全不懂 AI 的人解释：为什么 agent 不能把所有资料都放进 context？
+2. 如果我要让一个 coding agent 修复“登录按钮点击无效”，怎样设计 just-in-time context 的读取顺序？
+3. 区分 embedding retrieval、compaction、structured notes。它们分别解决什么问题？
+4. 为什么不建议把所有 edge cases 都写进 prompt？如果不写进 prompt，应该放在哪里？
+5. 长任务里 compaction、structured notes、sub-agent 三者如何组合使用？
+
+## 对 Coding Agent 的启发
+
+一个对 AI 友好的代码仓库，不只是代码写得清楚，还要有导航层：
+
+- `README.md`：项目目的、启动方式、主要模块。
+- `AGENTS.md` / `CLAUDE.md`：AI 协作规则、命令、约束、常见坑。
+- `architecture.md`：模块边界和数据流。
+- `project-map.md`：关键目录和入口文件。
+- 测试和错误输出：为 agent 提供可验证反馈。
+- 任务笔记：保存 plan state、progress state、decision state。
+
+未来可能会出现更明确的 “AI-readable project metadata” 格式，用来让 agent 先读少量元信息，就能理解项目结构、文件职责、时间状态和关联关系。
+
+## 和我的其他主题的关系
+
+- [[Agent 对话与知识沉淀]]
+- [[Repo-Specific、Spec-Driven 与 Harness]]
+- [[学习型 Agent 工作流设计]]
+- [[学习型 Agent Prompt 与状态设计]]
+- [[Agent Ready Template 项目解读报告]]
+
+## 和其他文章的关系
+
+- [[Building Effective Agents]]
+- [[Don't Build Multi-Agents]]
+- [[Multi-Agent Research System]]

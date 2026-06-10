@@ -396,6 +396,35 @@ Content here...
 
 2. Contentlayer 自动处理，访问 `/blog/my-new-post`
 
+### 博文发布与分支规范
+
+创建、修改或发布博文时，默认不要直接 commit 或 push 到 `main` 分支。`main` 通常对应生产部署入口，博文的 MDX frontmatter、图片路径、slug、标签或排版错误都可能导致构建失败或线上展示异常。
+
+后续使用 agent 工具创建博文并推送时，必须默认按以下流程执行：
+
+```bash
+git checkout main
+git pull
+
+git checkout -b post/my-new-post
+
+# 创建或修改 data/blog/*.mdx
+pnpm build
+
+git add data/blog/my-new-post.mdx
+git commit -m "docs: add my new post"
+git push -u origin post/my-new-post
+```
+
+推送分支后，通过 GitHub 创建 PR，等待 CI / Vercel Preview / 本地构建验证通过后，再合并到 `main`。
+
+执行规则：
+
+- 新博文、大幅修改旧文、涉及图片或 frontmatter 的改动：必须走 `post/<slug>` 分支 + PR 合并流程。
+- 轻微 typo、单个链接或标点修复：可以直接提交到 `main`，但如果 agent 代为操作，仍优先走分支 + PR，除非用户明确要求直接推 `main`。
+- agent 在执行博文发布、推送、合并相关操作前，应先检查当前分支和工作区状态，避免覆盖用户未提交的改动。
+- 合并 PR 前至少运行 `pnpm build`；如果本地环境缺少数据库或环境变量导致无法完整构建，需要在回复中明确说明，并依赖 PR CI / Vercel Preview 作为最终发布检查。
+
 ### 添加新 API 路由
 
 ```bash

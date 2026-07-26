@@ -52,3 +52,14 @@ export interface LabItem {
   status: 'completed' | 'in-progress' | 'planned';
   tags: string[];
 }
+
+export interface SkillAsset {
+  slug: string;
+  title: string;
+  description: string;
+  href: string;
+  category: string;
+  badge: string;
+  featured?: boolean;
+  tags: string[];
+}

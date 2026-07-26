@@ -15,30 +15,30 @@
 
 ## 当前能力矩阵
 
-| 能力                  | 状态       | 当前说明                         | 典型入口                                |
-| --------------------- | ---------- | -------------------------------- | --------------------------------------- |
-| 首页                  | `OPEN`     | 对外主入口                       | `/`                                     |
-| 博客列表              | `OPEN`     | 主线内容入口                     | `/blog`                                 |
-| 博客分类              | `OPEN`     | 技术 / 生活分类列表              | `/blog/tech` `/blog/life`               |
-| 随笔记录流            | `OPEN`     | 内容优先、可快速扫读的 feed      | `/blog/essay`                           |
-| 博客详情              | `OPEN`     | 技术 / 生活文章详情              | `/blog/[...slug]`                       |
-| 随笔详情              | `OPEN`     | 单条记录展开与评论               | `/blog/[...slug]`                       |
-| 标签页                | `OPEN`     | 标签浏览与聚合                   | `/tags` `/tags/[tag]`                   |
-| 关于页                | `OPEN`     | 作者与个人信息展示               | `/about`                                |
-| 评论                  | `OPEN`     | 依赖 Giscus 配置，文章与随笔详情页可用 | 详情页                              |
-| RSS                   | `OPEN`     | 当前推荐订阅方式                 | `/feed.xml`                             |
-| 搜索                  | `OPEN`     | 本地搜索索引，依赖构建生成       | 搜索按钮 / `search.json`                |
-| 文章统计              | `OPEN`     | 浏览量与互动统计                 | `/api/stats`                            |
-| GitHub 仓库信息       | `OPEN`     | 页面展示的仓库动态信息           | `/api/github`                           |
-| 实验室入口            | `LIMITED`  | 当前只保留占位页                 | `/lab`                                  |
-| 实验室 demo 子页      | `DISABLED` | 不作为当前公开主线继续扩展       | `/lab/*`                                |
-| Projects 页           | `DISABLED` | 当前返回 404                     | `/projects`                             |
-| 邮件 newsletter       | `DISABLED` | 当前未启用，仅显式返回未启用状态 | `/api/newsletter`                       |
-| 国际化                | `DISABLED` | 当前仅保留文档，不进入实现       | 文档层                                  |
-| Spotify / now playing | `DISABLED` | 历史能力，当前不恢复             | 无                                      |
-| sitemap / robots      | `INTERNAL` | 对搜索引擎和站点发现性提供支撑   | `/sitemap.xml` `/robots.txt`            |
-| Contentlayer 构建链路 | `INTERNAL` | 内容解析与索引生成               | 构建过程                                |
-| Prisma / PostgreSQL   | `INTERNAL` | 数据存储支撑层                   | 服务层                                  |
+| 能力                  | 状态       | 当前说明                               | 典型入口                     |
+| --------------------- | ---------- | -------------------------------------- | ---------------------------- |
+| 首页                  | `OPEN`     | 对外主入口                             | `/`                          |
+| 博客列表              | `OPEN`     | 主线内容入口                           | `/blog`                      |
+| 博客分类              | `OPEN`     | 技术 / 生活分类列表                    | `/blog/tech` `/blog/life`    |
+| 随笔记录流            | `OPEN`     | 内容优先、可快速扫读的 feed            | `/blog/essay`                |
+| 博客详情              | `OPEN`     | 技术 / 生活文章详情                    | `/blog/[...slug]`            |
+| 随笔详情              | `OPEN`     | 单条记录展开与评论                     | `/blog/[...slug]`            |
+| 标签页                | `OPEN`     | 标签浏览与聚合                         | `/tags` `/tags/[tag]`        |
+| 关于页                | `OPEN`     | 作者与个人信息展示                     | `/about`                     |
+| 评论                  | `OPEN`     | 依赖 Giscus 配置，文章与随笔详情页可用 | 详情页                       |
+| RSS                   | `OPEN`     | 当前推荐订阅方式                       | `/feed.xml`                  |
+| 搜索                  | `OPEN`     | 本地搜索索引，依赖构建生成             | 搜索按钮 / `search.json`     |
+| 文章统计              | `OPEN`     | 浏览量与互动统计                       | `/api/stats`                 |
+| GitHub 仓库信息       | `OPEN`     | 页面展示的仓库动态信息                 | `/api/github`                |
+| 实验室入口            | `LIMITED`  | 当前只保留轻量 Skills 资产卡片展示     | `/lab`                       |
+| 实验室 demo 子页      | `DISABLED` | 不作为当前公开主线继续扩展             | `/lab/*`                     |
+| Projects 页           | `DISABLED` | 当前返回 404                           | `/projects`                  |
+| 邮件 newsletter       | `DISABLED` | 当前未启用，仅显式返回未启用状态       | `/api/newsletter`            |
+| 国际化                | `DISABLED` | 当前仅保留文档，不进入实现             | 文档层                       |
+| Spotify / now playing | `DISABLED` | 历史能力，当前不恢复                   | 无                           |
+| sitemap / robots      | `INTERNAL` | 对搜索引擎和站点发现性提供支撑         | `/sitemap.xml` `/robots.txt` |
+| Contentlayer 构建链路 | `INTERNAL` | 内容解析与索引生成                     | 构建过程                     |
+| Prisma / PostgreSQL   | `INTERNAL` | 数据存储支撑层                         | 服务层                       |
 
 ## 使用规则
 

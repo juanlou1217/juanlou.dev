@@ -17,7 +17,7 @@
 - `/blog/essay` 随笔记录流
 - `/tags` 与 `/tags/[tag]`
 - `/about`
-- `/lab` 占位页
+- `/lab` 轻量 Skills 资产展示
 
 当前明确不应被 agent 擅自恢复或扩展为完整功能的区域：
 
@@ -108,7 +108,7 @@
 典型例子：
 
 - newsletter API 存在，不代表应该继续接邮件服务
-- lab 目录存在，不代表应该继续加 demo
+- lab 目录存在，不代表应该继续加复杂 demo；当前只适合放轻量 Skills 资产卡片
 - i18n 指南存在，不代表应该立刻引入 `next-intl`
 
 判断原则：

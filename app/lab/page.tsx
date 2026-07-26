@@ -1,6 +1,6 @@
 import { genPageMetadata } from '@/lib/seo';
-import Link from '@/components/ui/Link';
-import Button from '@/components/ui/Button';
+import skillsData from '@/data/skillsData';
+import SkillAssetCard from '@/components/lab/SkillAssetCard';
 
 export const metadata = genPageMetadata({ title: '实验室' });
 
@@ -14,22 +14,11 @@ export default function Lab() {
         <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">这里会逐步放一些实验性功能和小工具。</p>
       </div>
 
-      <div className="py-20">
-        <div className="mx-auto max-w-3xl rounded-3xl border border-dashed border-gray-300 bg-white/70 px-8 py-16 text-center dark:border-gray-700 dark:bg-gray-900/60">
-          <p className="text-sm font-medium tracking-[0.3em] text-gray-500 uppercase dark:text-gray-400">Coming Soon</p>
-          <h2 className="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100">实验室正在整理中</h2>
-          <p className="mt-4 text-base leading-7 text-gray-600 dark:text-gray-400">
-            当前先保留一个入口，后续有成熟 demo 或工具时再逐个补上。
-          </p>
-          <div className="mt-8">
-            <Button
-              as={Link}
-              href="/"
-              className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 border-transparent text-white! dark:text-white! dark:hover:bg-sky-400"
-            >
-              返回首页
-            </Button>
-          </div>
+      <div className="py-8">
+        <div className="grid gap-4">
+          {skillsData.map((item) => (
+            <SkillAssetCard key={item.slug} item={item} />
+          ))}
         </div>
       </div>
     </div>

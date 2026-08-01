@@ -1,14 +1,38 @@
 import ListLayout from '@/layouts/ListLayout';
 import { notFound } from 'next/navigation';
 import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer';
-import { getBlogsByCategory, getPageNumber, getTotalPages, isPageOutOfRange, POSTS_PER_PAGE } from '@/lib/content';
+import {
+  getBlogsByCategory,
+  getPageNumber,
+  getPaginationStaticParams,
+  getTotalPages,
+  isPageOutOfRange,
+  POSTS_PER_PAGE,
+} from '@/lib/content';
+import { BLOG_CATEGORY_DETAILS } from '@/lib/blog-taxonomy';
+import { genPaginationMetadata } from '@/lib/seo';
+
+const CATEGORY = BLOG_CATEGORY_DETAILS.tech;
 
 export const generateStaticParams = async () => {
   const totalPages = getTotalPages(getBlogsByCategory('tech').length, POSTS_PER_PAGE);
-  const paths = Array.from({ length: totalPages }, (_, i) => ({ page: (i + 1).toString() }));
-
-  return paths;
+  return getPaginationStaticParams(totalPages);
 };
+
+export async function generateMetadata(props: { params: Promise<{ page: string }> }) {
+  const { page } = await props.params;
+  const pageNumber = getPageNumber(page);
+  const totalPages = getTotalPages(getBlogsByCategory('tech').length, POSTS_PER_PAGE);
+
+  if (Number.isNaN(pageNumber) || isPageOutOfRange(pageNumber, totalPages)) notFound();
+
+  return genPaginationMetadata({
+    title: CATEGORY.label,
+    description: CATEGORY.description,
+    basePath: CATEGORY.path,
+    pageNumber,
+  });
+}
 
 export default async function TechPagePagination(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
@@ -24,7 +48,7 @@ export default async function TechPagePagination(props: { params: Promise<{ page
   const pagination = {
     currentPage: pageNumber,
     totalPages,
-    basePath: '/blog/tech',
+    basePath: CATEGORY.path,
   };
 
   return (

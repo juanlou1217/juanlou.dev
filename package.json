@@ -9,7 +9,7 @@
   "scripts": {
     "start": "next dev",
     "dev": "NODE_OPTIONS='--no-deprecation' contentlayer2 build && cross-env INIT_CWD=$PWD next dev",
-    "build": "NODE_OPTIONS='--no-deprecation' contentlayer2 build && next build",
+    "build": "NODE_OPTIONS='--no-deprecation' contentlayer2 build && next build --webpack",
     "vercel-build": "bash build.sh",
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",

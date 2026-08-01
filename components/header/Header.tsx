@@ -33,7 +33,7 @@ const Header = () => {
             <Logo className="h-8 w-8" />
           </div>
           <div className="group ml-2 text-xl font-bold transition duration-300">
-            卷娄的折腾日记
+            {siteMetadata.headerTitle}
             <span className="block h-0.5 max-w-0 bg-black transition-all duration-500 group-hover:max-w-[85%] dark:bg-white"></span>
           </div>
         </Link>

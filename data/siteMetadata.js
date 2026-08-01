@@ -7,10 +7,12 @@ const hasGiscusConfig = Boolean(
 
 const siteMetadata = {
   title: '卷娄的小屋',
+  brandName: 'Juanlou（卷娄）',
+  alternateNames: ['Juanlou', '卷娄', 'juanlou.top'],
   author: '卷娄',
   fullName: '赵康',
-  headerTitle: '卷娄的折腾日记',
-  description: '一个年轻工程师的技术、生活和成长记录。写代码，也写自己如何思考、探索和慢慢变清楚。',
+  headerTitle: 'Juanlou（卷娄）',
+  description: 'Juanlou（卷娄）是赵康的个人博客，记录 AI Agent、前端工程、技术实践，以及一个年轻工程师的生活与成长。',
   language: 'zh-CN',
   theme: 'system',
   siteUrl: 'https://juanlou.top',

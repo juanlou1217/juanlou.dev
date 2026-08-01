@@ -13,10 +13,10 @@ export async function generateMetadata(props: { params: Promise<{ tag: string }>
   const tag = decodeURI(params.tag);
 
   return genPageMetadata({
-    title: tag,
-    description: `${siteMetadata.title} ${tag} tagged content`,
+    title: `${tag} 相关文章`,
+    description: `浏览 ${siteMetadata.brandName} 中标记为“${tag}”的公开文章。`,
+    path: `/tags/${tag}`,
     alternates: {
-      canonical: './',
       types: {
         'application/rss+xml': `${siteMetadata.siteUrl}/tags/${tag}/feed.xml`,
       },

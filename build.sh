@@ -19,7 +19,7 @@ node scripts/postgenerate.mjs
 echo "🔧 Step 4: Building Contentlayer..."
 NODE_OPTIONS='--no-deprecation' contentlayer2 build
 
-echo "🔧 Step 5: Building Next.js..."
-next build
+echo "🔧 Step 5: Building Next.js with webpack..."
+next build --webpack
 
 echo "✅ Build completed successfully!"

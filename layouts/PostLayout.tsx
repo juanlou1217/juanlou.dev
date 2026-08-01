@@ -8,6 +8,8 @@ import siteMetadata from '@/data/siteMetadata';
 import BlogTags from '@/components/blog/BlogTags';
 import BlogMeta from '@/components/blog/BlogMeta';
 import BlogNav from '@/components/blog/BlogNav';
+import BlogBreadcrumbs from '@/components/blog/BlogBreadcrumbs';
+import RelatedPosts from '@/components/blog/RelatedPosts';
 import TableOfContents from '@/components/blog/TableOfContents';
 import Reactions from '@/components/blog/Reactions';
 import Comments from '@/components/ui/Comments';
@@ -25,7 +27,7 @@ interface LayoutProps {
 
 export default function PostLayout(props: LayoutProps) {
   const { content, next, prev, children } = props;
-  const { slug, toc, date, title, tags, readingTime, type } = content;
+  const { slug, toc, date, title, tags, readingTime, type, category } = content;
 
   return (
     <SectionContainer>
@@ -34,6 +36,7 @@ export default function PostLayout(props: LayoutProps) {
       <article>
         {/*START: Header*/}
         <header>
+          <BlogBreadcrumbs category={category} title={title} />
           <div className="dark:border-gray space-y-1 border-b border-gray-200 pb-10">
             <div className="space-y-6">
               <PageTitle>{title}</PageTitle>
@@ -50,7 +53,7 @@ export default function PostLayout(props: LayoutProps) {
         {/*END: Header*/}
 
         {/*START: Content*/}
-        <main className="grid grid-cols-1 gap-12 pt-8 lg:grid-cols-12 lg:pt-10">
+        <div className="grid grid-cols-1 gap-12 pt-8 lg:grid-cols-12 lg:pt-10">
           <div className="divide-y divide-gray-200 lg:col-span-8 xl:col-span-9 dark:divide-gray-700">
             <div className="prose dark:prose-dark lg:prose-lg max-w-none lg:pb-8">{children}</div>
           </div>
@@ -61,11 +64,12 @@ export default function PostLayout(props: LayoutProps) {
               <Reactions className="pt-6" type={type.toLowerCase() as StatsType} slug={slug} />
             </div>
           </div>
-        </main>
+        </div>
         {/*END: Content*/}
 
         {/*START: Footer*/}
         <footer>
+          <RelatedPosts post={content} />
           <BlogNav next={next} prev={prev} />
 
           {siteMetadata.comments && (

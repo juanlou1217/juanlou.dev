@@ -2,8 +2,13 @@ import ListLayout from '@/layouts/ListLayout';
 import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer';
 import { genPageMetadata } from '@/lib/seo';
 import { getBlogsByCategory, POSTS_PER_PAGE } from '@/lib/content';
+import { BLOG_CATEGORY_DETAILS } from '@/lib/blog-taxonomy';
 
-export const metadata = genPageMetadata({ title: '技术分享' });
+export const metadata = genPageMetadata({
+  title: BLOG_CATEGORY_DETAILS.tech.label,
+  description: BLOG_CATEGORY_DETAILS.tech.description,
+  path: BLOG_CATEGORY_DETAILS.tech.path,
+});
 
 export default function TechBlogPage() {
   const posts = allCoreContent(sortPosts(getBlogsByCategory('tech')));

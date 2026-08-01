@@ -2,7 +2,9 @@ import { sortPosts, allCoreContent } from 'pliny/utils/contentlayer';
 import { slug } from 'github-slugger';
 
 import { HomeContent } from '@/components/homepage/HomeContent';
+import JsonLd from '@/components/seo/JsonLd';
 import { getPublishedBlogs } from '@/lib/content';
+import { getWebSiteJsonLd } from '@/lib/structured-data';
 
 export default async function Page() {
   const publishedBlogs = getPublishedBlogs();
@@ -31,5 +33,10 @@ export default async function Page() {
       count: tag.count,
     }));
 
-  return <HomeContent posts={posts} popularTags={popularTags} />;
+  return (
+    <>
+      <JsonLd data={getWebSiteJsonLd()} />
+      <HomeContent posts={posts} popularTags={popularTags} />
+    </>
+  );
 }

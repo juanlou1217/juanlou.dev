@@ -60,7 +60,9 @@ export default function EssayTimelineLayout(props: EssayTimelineLayoutProps) {
   return (
     <SectionContainer>
       <div className="space-y-3 pt-8 pb-6">
-        <p className="text-xs font-semibold tracking-[0.24em] text-gray-500 uppercase dark:text-gray-400">Essay Timeline</p>
+        <p className="text-xs font-semibold tracking-[0.24em] text-gray-500 uppercase dark:text-gray-400">
+          Essay Timeline
+        </p>
         <div className="max-w-3xl space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl dark:text-gray-50">{title}</h1>
           <p className="text-base leading-7 text-gray-600 dark:text-gray-300">
@@ -76,7 +78,7 @@ export default function EssayTimelineLayout(props: EssayTimelineLayoutProps) {
       )}
 
       <div className="relative border-t border-gray-200 pt-2 dark:border-gray-800">
-        <div className="absolute top-0 bottom-0 left-5 hidden w-px bg-gray-200 dark:bg-gray-800 sm:block" />
+        <div className="absolute top-0 bottom-0 left-5 hidden w-px bg-gray-200 sm:block dark:bg-gray-800" />
         {displayPosts.map((post) => (
           <article key={post.path} className="relative py-7">
             <div className="flex items-start gap-4">
@@ -98,19 +100,26 @@ export default function EssayTimelineLayout(props: EssayTimelineLayoutProps) {
 
               <div className="min-w-0 flex-1 space-y-3">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">{defaultAuthor?.name || siteMetadata.author}</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
+                    {defaultAuthor?.name || siteMetadata.author}
+                  </span>
                   <time dateTime={post.date} className="text-xs text-gray-500 dark:text-gray-400">
                     {formatDate(post.date, siteMetadata.locale)}
                   </time>
                   <span className="text-xs text-gray-400 dark:text-gray-500">·</span>
-                  <Link href={`/${post.path}`} className="text-xs text-gray-500 transition-colors hover:text-primary-500 dark:text-gray-400">
+                  <Link
+                    href={`/${post.path}`}
+                    className="hover:text-primary-500 text-xs text-gray-500 transition-colors dark:text-gray-400"
+                  >
                     详情 / 评论
                   </Link>
                 </div>
 
                 <div className="rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-[0_1px_0_rgba(15,23,42,0.02)] dark:border-gray-800 dark:bg-gray-950/70">
-                  <p className="text-base font-semibold tracking-tight text-gray-950 dark:text-gray-50">{post.title}</p>
-                  <div className="prose prose-gray mt-3 max-w-none dark:prose-invert prose-p:my-3 prose-headings:mt-5 prose-headings:mb-3 prose-h1:text-xl prose-h2:text-lg prose-h3:text-base">
+                  <h2 className="text-base font-semibold tracking-tight text-gray-950 dark:text-gray-50">
+                    {post.title}
+                  </h2>
+                  <div className="prose prose-gray dark:prose-invert prose-p:my-3 prose-headings:mt-5 prose-headings:mb-3 prose-h1:text-xl prose-h2:text-lg prose-h3:text-base mt-3 max-w-none">
                     <MDXLayoutRenderer code={post.body.code} components={components} toc={post.toc} />
                   </div>
                 </div>

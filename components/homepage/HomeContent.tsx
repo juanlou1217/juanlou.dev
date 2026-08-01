@@ -1,6 +1,3 @@
-'use client';
-
-import dynamic from 'next/dynamic';
 import { formatDate } from 'pliny/utils/formatDate';
 
 import siteMetadata from '@/data/siteMetadata';
@@ -14,30 +11,16 @@ import PopularTags from '@/components/homepage/PopularTags';
 import ShortDescription from '@/components/homepage/ShortDescription';
 import Greeting from '@/components/homepage/Greeting';
 import ProfileCard from '@/components/homepage/ProfileCard';
+import HomeEffects from '@/components/homepage/HomeEffects';
 
-// Dynamic imports for heavy components (bundle-dynamic-imports)
-const Snowfall = dynamic(() => import('react-snowfall'), { ssr: false });
-const TypedBios = dynamic(() => import('@/components/homepage/TypedBios'), { ssr: false });
+import TypedBios from '@/components/homepage/TypedBios';
 
 const MAX_DISPLAY = 5;
 
 export function HomeContent({ posts, popularTags }) {
   return (
     <div className="relative">
-      <Snowfall
-        snowflakeCount={119}
-        speed={[0.4, 2]}
-        wind={[-0.2, 0.4]}
-        radius={[0.5, 2]}
-        opacity={[0.15, 0.4]}
-        style={{
-          position: 'fixed',
-          width: '100vw',
-          height: '100vh',
-          zIndex: -1,
-          pointerEvents: 'none',
-        }}
-      />
+      <HomeEffects />
 
       {/* Introduce myself */}
       <div className="flex flex-col justify-between md:my-4 md:pb-18 xl:flex-row">
@@ -61,9 +44,9 @@ export function HomeContent({ posts, popularTags }) {
       {/* List all post */}
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="space-y-2 py-6 md:space-y-5">
-          <h1 className="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14 dark:text-gray-100">
+          <h2 className="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14 dark:text-gray-100">
             最新文章
-          </h1>
+          </h2>
           <p className="mt-2! text-lg leading-7 text-gray-500 dark:text-gray-400">{siteMetadata.description}</p>
         </div>
 

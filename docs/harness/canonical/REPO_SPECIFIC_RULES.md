@@ -81,6 +81,8 @@
 - 普通文章详情优先走 `layouts/PostLayout.tsx`、`layouts/PostSimple.tsx`、`layouts/PostBanner.tsx`
 - 随笔详情优先走 `layouts/EssayLayout.tsx`
 - SEO metadata 优先走 `lib/seo.ts`
+- JSON-LD 数据优先走 `lib/structured-data.ts`，渲染统一复用 `components/seo/JsonLd.tsx`
+- 文章主题内链优先复用 `components/blog/RelatedPosts.tsx`
 
 如果一个功能能通过补齐现有 layout 或 util 解决，不应新起一套 page-local 逻辑。
 

@@ -8,6 +8,8 @@ import siteMetadata from '@/data/siteMetadata';
 import BlogTags from '@/components/blog/BlogTags';
 import BlogMeta from '@/components/blog/BlogMeta';
 import Link from '@/components/ui/Link';
+import BlogBreadcrumbs from '@/components/blog/BlogBreadcrumbs';
+import RelatedPosts from '@/components/blog/RelatedPosts';
 import Comments from '@/components/ui/Comments';
 import PageTitle from '@/components/ui/PageTitle';
 import SectionContainer from '@/components/ui/SectionContainer';
@@ -21,7 +23,7 @@ interface LayoutProps {
 }
 
 export default function PostLayout({ content, next, prev, children }: LayoutProps) {
-  const { slug, date, title, tags, readingTime } = content;
+  const { slug, date, title, tags, readingTime, category } = content;
 
   return (
     <SectionContainer>
@@ -30,6 +32,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
       <article>
         <div>
           <header>
+            <BlogBreadcrumbs category={category} title={title} />
             <div className="dark:border-gray space-y-1 border-b border-gray-200 pb-10">
               <div className="space-y-6">
                 <PageTitle>{title}</PageTitle>
@@ -53,6 +56,8 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
                 <Comments />
               </div>
             )}
+
+            <RelatedPosts post={content} />
 
             <footer>
               <div className="flex flex-col text-sm font-medium sm:flex-row sm:justify-between sm:text-base">

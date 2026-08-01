@@ -9,8 +9,11 @@ import { allBlogs, allAuthors } from 'contentlayer/generated';
 import { sortPosts, coreContent, allCoreContent } from 'pliny/utils/contentlayer';
 
 import components from '@/components/ui/MDXComponents';
+import JsonLd from '@/components/seo/JsonLd';
 import siteMetadata from '@/data/siteMetadata';
 import { getEssayBlogs, getPublishedBlogs, isEssayBlog } from '@/lib/content';
+import { absoluteUrl } from '@/lib/seo';
+import { getBlogBreadcrumbJsonLd, getBlogPostingJsonLd } from '@/lib/structured-data';
 import { EssayLayout, PostSimple, PostLayout, PostBanner } from 'layouts';
 
 const defaultLayout = 'PostLayout';
@@ -43,15 +46,18 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
   if (post.images) {
     imageList = typeof post.images === 'string' ? [post.images] : post.images;
   }
-  const ogImages = imageList.map((img) => {
-    return {
-      url: img.includes('http') ? img : siteMetadata.siteUrl + img,
-    };
-  });
+  const canonicalUrl = absoluteUrl(`/${post.path}`);
+  const ogImages = imageList.map((img) => ({ url: absoluteUrl(String(img)), alt: post.title }));
 
   return {
     title: post.title,
     description: post.summary,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    authors: authorDetails.map((author) => ({ name: author.name, url: `${siteMetadata.siteUrl}/about` })),
+    keywords: post.tags,
+    category: post.category,
     openGraph: {
       title: post.title,
       description: post.summary,
@@ -60,15 +66,16 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
       type: 'article',
       publishedTime: publishedAt,
       modifiedTime: modifiedAt,
-      url: './',
+      url: canonicalUrl,
       images: ogImages,
       authors: authors.length > 0 ? authors : [siteMetadata.author],
+      tags: post.tags,
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.summary,
-      images: imageList,
+      images: ogImages,
     },
   };
 }
@@ -101,20 +108,16 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
     return coreContent(authorResults as Authors);
   });
   const mainContent = coreContent(post);
-  const jsonLd = post.structuredData;
-  jsonLd['author'] = authorDetails.map((author) => {
-    return {
-      '@type': 'Person',
-      name: author.name,
-    };
-  });
+  const articleJsonLd = getBlogPostingJsonLd(post, authorDetails);
+  const breadcrumbJsonLd = getBlogBreadcrumbJsonLd(post);
 
   const layoutKey = isEssayBlog(post) ? 'EssayLayout' : post.layout || defaultLayout;
   const Layout = layouts[layoutKey];
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={articleJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <Layout content={mainContent} authorDetails={authorDetails} next={next} prev={prev}>
         <MDXLayoutRenderer code={post.body.code} components={components} toc={post.toc} />
       </Layout>

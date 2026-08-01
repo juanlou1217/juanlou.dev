@@ -129,6 +129,10 @@
   浏览量展示。
 - `Reactions.tsx`
   互动反应组件。
+- `BlogBreadcrumbs.tsx`
+  文章详情页的可见面包屑，层级与 `BreadcrumbList` JSON-LD 保持一致。
+- `RelatedPosts.tsx`
+  根据真实文章标签和分类生成主题相关文章内链。
 
 ## 6. `components/about/`
 
@@ -183,3 +187,8 @@
   先看 `components/header/` 和 `components/footer/`
 
 如果搜索完这些目录仍然没有合适实现，再考虑新增组件。
+
+## 10. `components/seo/`
+
+- `JsonLd.tsx`
+  结构化数据脚本的统一、安全渲染入口；数据构造集中在 `lib/structured-data.ts`。

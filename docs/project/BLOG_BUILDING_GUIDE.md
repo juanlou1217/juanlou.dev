@@ -107,7 +107,7 @@ data/blog/*.mdx
 
 - frontmatter 里明确约束了 `title`、`date`、`tags`、`category` 等字段
 - `category` 当前只允许 `tech`、`life`、`essay`
-- 构建时会生成 `readingTime`、`toc`、`slug`、`structuredData`
+- 构建时会生成 `readingTime`、`toc`、`slug` 等派生字段
 - 构建成功后会额外写出 `app/tag-data.json` 和 `public/search.json`
 
 这能体现一个观点：**内容系统不是“存文章”，而是“为页面和功能提供结构化内容数据”**。

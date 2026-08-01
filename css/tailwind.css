@@ -19,11 +19,11 @@
     border-color: var(--color-gray-200, currentcolor);
   }
 
-  /* Override font-sans to include Outfit font */
+  /* Keep builds and rendering independent from third-party font requests. */
   :root {
     --font-sans:
-      var(--font-outfit), ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-      'Segoe UI Symbol', 'Noto Color Emoji';
+      ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif, 'Apple Color Emoji',
+      'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   }
 }
 

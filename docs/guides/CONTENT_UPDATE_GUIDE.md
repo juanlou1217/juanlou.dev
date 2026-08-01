@@ -70,7 +70,7 @@ layout: PostLayout
 | `images` | ❌ | 封面图片数组 | `['/static/images/cover.jpg']` |
 | `authors` | ❌ | 作者 ID 数组 | `['default']` |
 | `layout` | ❌ | 布局模板 | `PostLayout` 或 `PostBanner` |
-| `canonicalUrl` | ❌ | 原文链接（转载时使用） | `'https://example.com/post'` |
+| `sourceUrl` | ❌ | 参考原文链接；不会替换本站 canonical | `'https://example.com/post'` |
 
 **步骤 3：编写内容**
 

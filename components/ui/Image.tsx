@@ -1,37 +1,24 @@
-'use client';
-
 import { clsx } from 'clsx';
 import NextImage from 'next/image';
 
 import type { ImageProps as NextImageProps } from 'next/image';
 
-import { useImageLoadedState } from 'hooks';
-
-export interface ImageProps extends Omit<NextImageProps, 'src' | 'priority'> {
+export interface ImageProps extends Omit<NextImageProps, 'src'> {
   src: string;
 }
 
 const Image = (props: ImageProps) => {
-  const { alt, src, loading = 'lazy', style, className, ...rest } = props;
-  const [loaded, onLoad] = useImageLoadedState(src);
+  const { alt, src, loading = 'lazy', style, className, quality = 75, ...rest } = props;
 
   return (
-    <div
-      className={clsx(
-        'image-container relative overflow-hidden',
-        !loaded && 'animate-pulse [animation-duration:4s]',
-        className
-      )}
-    >
+    <div className={clsx('image-container relative overflow-hidden', className)}>
       <NextImage
-        className={clsx('transition-all duration-500 ease-in-out', 'object-center', loaded ? 'blur-0' : 'blur-xl')}
+        className="object-center"
         src={src}
         alt={alt}
         style={{ objectFit: 'cover', ...style }}
         loading={loading}
-        priority={loading === 'eager'}
-        quality={100}
-        onLoad={onLoad}
+        quality={quality}
         {...rest}
       />
     </div>

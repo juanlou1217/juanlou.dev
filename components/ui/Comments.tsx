@@ -8,6 +8,7 @@ import { CommentsProps, GiscusConfigs } from '@/types/index';
 
 export default function Comments(props: CommentsProps) {
   const { configs, className } = props;
+  const { theme: siteTheme, resolvedTheme } = useTheme();
 
   const defaultConfigs = SITE_METADATA.comments?.giscusConfig as GiscusConfigs | undefined;
   if (!defaultConfigs) {
@@ -28,7 +29,6 @@ export default function Comments(props: CommentsProps) {
     mapping,
   } = { ...defaultConfigs, ...configs };
 
-  const { theme: siteTheme, resolvedTheme } = useTheme();
   const commentsTheme =
     themeURL === '' ? (siteTheme === 'dark' || resolvedTheme === 'dark' ? darkTheme : theme) : themeURL;
 

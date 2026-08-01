@@ -5,7 +5,6 @@ import 'react-medium-image-zoom/dist/styles.css';
 import 'remark-github-blockquote-alert/alert.css';
 
 import { Metadata } from 'next';
-import { Outfit } from 'next/font/google';
 import { SearchProvider, SearchConfig } from 'pliny/search';
 // import { Analytics, AnalyticsConfig } from 'pliny/analytics';
 
@@ -18,28 +17,27 @@ import TiltedGridBackground from '@/components/ui/TiltedGridBackground';
 import { ThemeProviders } from '@/providers/theme-providers';
 import { UmamiAnalytics } from '@/components/analytics/umami';
 
-const FONT_OUTFIT = Outfit({
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-outfit',
-});
-
 const OG_LOCALE = siteMetadata.locale.replace('-', '_');
+const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
+  applicationName: siteMetadata.brandName,
   title: {
-    default: siteMetadata.title,
+    default: `${siteMetadata.brandName}｜赵康的技术、AI 与成长博客`,
     template: `%s | ${siteMetadata.title}`,
   },
   description: siteMetadata.description,
+  authors: [{ name: siteMetadata.fullName, url: `${siteMetadata.siteUrl}/about` }],
+  creator: siteMetadata.fullName,
+  publisher: siteMetadata.fullName,
+  verification: GOOGLE_SITE_VERIFICATION ? { google: GOOGLE_SITE_VERIFICATION } : undefined,
   openGraph: {
-    title: siteMetadata.title,
+    title: `${siteMetadata.brandName}｜赵康的技术、AI 与成长博客`,
     description: siteMetadata.description,
     url: './',
     siteName: siteMetadata.title,
-    images: [siteMetadata.socialBanner],
+    images: [{ url: siteMetadata.socialBanner, alt: siteMetadata.brandName }],
     locale: OG_LOCALE,
     type: 'website',
   },
@@ -61,9 +59,10 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: siteMetadata.title,
+    title: `${siteMetadata.brandName}｜赵康的技术、AI 与成长博客`,
+    description: siteMetadata.description,
     card: 'summary_large_image',
-    images: [siteMetadata.socialBanner],
+    images: [{ url: siteMetadata.socialBanner, alt: siteMetadata.brandName }],
   },
 };
 
@@ -71,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const basePath = process.env.BASE_PATH || '';
 
   return (
-    <html lang={siteMetadata.language} className={`${FONT_OUTFIT.variable} scroll-smooth`} suppressHydrationWarning>
+    <html lang={siteMetadata.language} className="scroll-smooth" suppressHydrationWarning>
       <link rel="apple-touch-icon" sizes="76x76" href={`${basePath}/static/favicons/tennis-racquet.png`} />
       <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/tennis-racquet.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/tennis-racquet.png" />
@@ -79,7 +78,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="msapplication-TileColor" content="#000000" />
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
-      <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <body
         className="dark:bg-dark bg-white pl-[calc(100vw-100%)] text-black antialiased dark:text-white"
         suppressHydrationWarning

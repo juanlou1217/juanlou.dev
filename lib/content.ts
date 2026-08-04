@@ -1,7 +1,7 @@
 import { allBlogs, type Blog } from 'contentlayer/generated';
 import { slug } from 'github-slugger';
 
-export const POSTS_PER_PAGE = 5;
+export const POSTS_PER_PAGE = 10;
 
 export function getPublishedBlogs(): Blog[] {
   return allBlogs.filter((post) => !post.draft);

@@ -1,6 +1,8 @@
 {
-  "name": "",
-  "short_name": "",
+  "name": "Juanlou（卷娄）｜赵康的技术、AI 与成长博客",
+  "short_name": "Juanlou（卷娄）",
+  "description": "赵康的个人博客，记录 AI Agent、前端工程、技术实践、生活与成长。",
+  "start_url": "/",
   "icons": [
     {
       "src": "/tennis-racquet.png",

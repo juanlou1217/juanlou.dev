@@ -218,7 +218,7 @@ data/blog/*.mdx
 - `draft`
 - `lastmod`
 - `bibliography`
-- `canonicalUrl`
+- `sourceUrl`
 
 其中 `category` 当前限定为：
 

@@ -2,7 +2,11 @@ import { genPageMetadata } from '@/lib/seo';
 import skillsData from '@/data/skillsData';
 import SkillAssetCard from '@/components/lab/SkillAssetCard';
 
-export const metadata = genPageMetadata({ title: '实验室' });
+export const metadata = genPageMetadata({
+  title: '实验室',
+  description: '查看 Juanlou（卷娄）整理的轻量 AI Skills 资产与仍在探索的小型实验。',
+  path: '/lab',
+});
 
 export default function Lab() {
   return (

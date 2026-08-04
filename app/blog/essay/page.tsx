@@ -2,8 +2,13 @@ import { sortPosts } from 'pliny/utils/contentlayer';
 import { genPageMetadata } from '@/lib/seo';
 import { EssayTimelineLayout } from 'layouts';
 import { getEssayBlogs, POSTS_PER_PAGE } from '@/lib/content';
+import { BLOG_CATEGORY_DETAILS } from '@/lib/blog-taxonomy';
 
-export const metadata = genPageMetadata({ title: '随笔' });
+export const metadata = genPageMetadata({
+  title: BLOG_CATEGORY_DETAILS.essay.label,
+  description: BLOG_CATEGORY_DETAILS.essay.description,
+  path: BLOG_CATEGORY_DETAILS.essay.path,
+});
 
 export default function EssayBlogPage() {
   const posts = sortPosts(getEssayBlogs());

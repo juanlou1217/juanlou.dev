@@ -14,9 +14,9 @@ const PopularTags = ({ tags }: { tags: PopularTag[] }) => {
   return (
     <div className="divide-y divide-gray-200 dark:divide-gray-700">
       <div className="space-y-2 py-6 md:space-y-5">
-        <h1 className="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14 dark:text-gray-100">
+        <h2 className="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14 dark:text-gray-100">
           热门标签
-        </h1>
+        </h2>
         <p className="mt-2! text-lg leading-7 text-gray-500 dark:text-gray-400">这里展示当前文章里真实存在的标签。</p>
       </div>
 

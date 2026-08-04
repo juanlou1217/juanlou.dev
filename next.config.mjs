@@ -65,7 +65,7 @@ const baseConfig = {
         hostname: 'via.placeholder.com', // Alternative placeholder service
       },
     ],
-    qualities: [100, 75],
+    qualities: [75],
     unoptimized,
   },
   async headers() {
@@ -74,6 +74,14 @@ const baseConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+    ];
+  },
+  async redirects() {
+    return [
+      { source: '/blog/page/1', destination: '/blog', permanent: true },
+      { source: '/blog/tech/page/1', destination: '/blog/tech', permanent: true },
+      { source: '/blog/life/page/1', destination: '/blog/life', permanent: true },
+      { source: '/blog/essay/page/1', destination: '/blog/essay', permanent: true },
     ];
   },
   webpack: (config) => {

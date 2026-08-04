@@ -6,7 +6,11 @@ import { genPageMetadata } from '@/lib/seo';
 import Link from '@/components/ui/Link';
 import Tag from '@/components/ui/Tag';
 
-export const metadata = genPageMetadata({ title: '标签', description: '我博客的主题' });
+export const metadata = genPageMetadata({
+  title: '文章标签',
+  description: '按主题浏览 Juanlou（卷娄）的技术文章、生活记录与随笔。',
+  path: '/tags',
+});
 
 export default async function Page() {
   const tagCounts = tagData as Record<string, number>;

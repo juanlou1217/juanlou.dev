@@ -7,6 +7,8 @@ import siteMetadata from '@/data/siteMetadata';
 import Image from '@/components/ui/Image';
 import Comments from '@/components/ui/Comments';
 import Link from '@/components/ui/Link';
+import BlogBreadcrumbs from '@/components/blog/BlogBreadcrumbs';
+import RelatedPosts from '@/components/blog/RelatedPosts';
 import PageTitle from '@/components/ui/PageTitle';
 import SectionContainer from '@/components/ui/SectionContainer';
 import ScrollTopAndComment from '@/components/ui/ScrollTopAndComment';
@@ -19,13 +21,14 @@ interface LayoutProps {
 }
 
 export default function PostMinimal({ content, next, prev, children }: LayoutProps) {
-  const { slug, title, images } = content;
+  const { slug, title, images, category } = content;
   const displayImage = images && images.length > 0 ? images[0] : 'https://picsum.photos/seed/picsum/800/400';
 
   return (
     <SectionContainer>
       <ScrollTopAndComment />
       <article>
+        <BlogBreadcrumbs category={category} title={title} />
         <div>
           <div className="space-y-1 pb-10 text-center dark:border-gray-700">
             <div className="w-full">
@@ -45,6 +48,7 @@ export default function PostMinimal({ content, next, prev, children }: LayoutPro
               <Comments />
             </div>
           )}
+          <RelatedPosts post={content} />
           <footer>
             <div className="flex flex-col text-sm font-medium sm:flex-row sm:justify-between sm:text-base">
               {prev && prev.path && (

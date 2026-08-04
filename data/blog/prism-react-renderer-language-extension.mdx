@@ -1,0 +1,237 @@
+---
+title: 'prism-react-renderer 扩展语言模块'
+date: '2025-10-03'
+tags: ['react', 'prismjs', 'syntax-highlighting', 'performance']
+category: 'tech'
+draft: false
+summary: '记录 prism-react-renderer 扩展语言支持的关键步骤，以及如何根据文件名识别语言并按需加载 Prism 语言模块。'
+authors: ['default']
+layout: PostLayout
+---
+
+> 历史发布：[掘金](https://juejin.cn/post/7555809229002440758) · [CSDN](https://blog.csdn.net/zk031217/article/details/152455907)。
+
+## 发布数据
+
+截至 2026 年 8 月 4 日，两个平台的公开数据如下。不同平台的展现和阅读统计口径不同，这里只作为历史记录。
+
+| 平台 | 展现 | 阅读 | 点赞 | 评论 | 收藏 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 掘金 | 368 | 219 | 0 | 0 | 1 |
+| CSDN | — | 369 | 3 | 0 | 5 |
+
+`prism-react-renderer` 是基于 Prism.js 的 React 封装。它把 Prism 生成的 Token 转换为 React 可以渲染的数据，避免直接操作 DOM，更适合放进 React 的渲染流程里。
+
+但 `prism-react-renderer` 默认打包的语言有限。如果项目需要展示更多类型的代码文件，就要额外加载对应的 Prism 语言定义。
+
+扩展语言支持最关键的一点是：**在 `<Highlight>` 渲染对应代码之前，先让语言模块注册到同一个 Prism 实例上。**
+
+参考资料：
+
+- [prism-react-renderer FAQ](https://github.com/FormidableLabs/prism-react-renderer#faq)
+- [prism-react-renderer Demo](https://github.com/FormidableLabs/prism-react-renderer/blob/master/packages/demo/src/App.tsx)
+
+## 注册额外的语言模块
+
+先安装需要的依赖：
+
+```bash
+pnpm add prism-react-renderer prismjs
+pnpm add -D @types/prismjs
+```
+
+然后把 `prism-react-renderer` 使用的 Prism 实例挂到全局，再加载对应语言模块：
+
+```tsx
+import { Highlight, Prism } from 'prism-react-renderer'
+
+globalThis.Prism = Prism
+
+await import('prismjs/components/prism-kotlin')
+await import('prismjs/components/prism-swift')
+
+export function CodeBlock({ code }: { code: string }) {
+  return (
+    <Highlight Prism={Prism} code={code} language="kotlin">
+      {({ tokens, getLineProps, getTokenProps }) => (
+        <pre>
+          {tokens.map((line, lineIndex) => (
+            <div key={lineIndex} {...getLineProps({ line })}>
+              {line.map((token, tokenIndex) => (
+                <span key={tokenIndex} {...getTokenProps({ token })} />
+              ))}
+            </div>
+          ))}
+        </pre>
+      )}
+    </Highlight>
+  )
+}
+```
+
+这里要注意两件事：
+
+1. 语言模块注册时使用的 Prism，必须和 `<Highlight>` 接收到的 Prism 是同一个实例。
+2. 语言模块的加载和注册，必须发生在对应代码块渲染之前。
+
+## 在工程里按文件名加载语言
+
+实际项目不会只有 Kotlin 或 Swift 两种文件。更常见的做法是把流程拆成三步：
+
+```text
+文件名
+  -> 推断语言
+  -> 加载对应语言模块
+  -> 使用 Highlight 渲染
+```
+
+### 1. 根据文件名推断语言
+
+不同文件可能通过普通后缀、特殊文件名或复合后缀确定语言，所以我把映射拆成三类：
+
+```ts
+const LANGUAGE_MAP: Record<string, string> = {
+  '.js': 'javascript',
+  '.ts': 'typescript',
+  '.kt': 'kotlin',
+  '.swift': 'swift',
+  '.py': 'python',
+}
+
+const SPECIAL_FILE_MAP: Record<string, string> = {
+  dockerfile: 'docker',
+  makefile: 'makefile',
+}
+
+const COMPOUND_EXTENSIONS: Record<string, string> = {
+  '.d.ts': 'typescript',
+  '.blade.php': 'php',
+}
+
+export function getLangFromFileName(fileName: string): string {
+  if (!fileName) return 'text'
+
+  const lowerFileName = fileName.toLowerCase()
+  const baseName = lowerFileName.split('/').pop() || ''
+
+  if (SPECIAL_FILE_MAP[baseName]) {
+    return SPECIAL_FILE_MAP[baseName]
+  }
+
+  for (const [extension, language] of Object.entries(COMPOUND_EXTENSIONS)) {
+    if (lowerFileName.endsWith(extension)) {
+      return language
+    }
+  }
+
+  const extensionMatch = lowerFileName.match(/\.[^./\\]+$/)
+
+  if (!extensionMatch) return 'text'
+
+  return LANGUAGE_MAP[extensionMatch[0]] ?? 'text'
+}
+```
+
+### 2. 动态加载语言定义
+
+语言包不需要一次性全部打进主包，可以通过映射表按需加载。这里还要缓存加载任务，避免同一种语言被重复请求。
+
+```tsx
+import { useEffect, useState } from 'react'
+import { Prism } from 'prism-react-renderer'
+
+globalThis.Prism = Prism
+
+const PRISM_LANGUAGE_LOADERS: Record<string, () => Promise<unknown>> = {
+  java: () => import('prismjs/components/prism-java'),
+  kotlin: () => import('prismjs/components/prism-kotlin'),
+  swift: () => import('prismjs/components/prism-swift'),
+}
+
+const languageLoadTasks = new Map<string, Promise<void>>()
+
+function loadPrismLanguage(language: string): Promise<void> {
+  const existingTask = languageLoadTasks.get(language)
+  if (existingTask) return existingTask
+
+  const loader = PRISM_LANGUAGE_LOADERS[language]
+  if (!loader) return Promise.resolve()
+
+  const task = loader().then(() => undefined)
+  languageLoadTasks.set(language, task)
+  return task
+}
+
+export function usePrismLanguageLoader(language: string) {
+  const [isReady, setIsReady] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    setIsReady(false)
+
+    loadPrismLanguage(language)
+      .then(() => {
+        if (active) setIsReady(true)
+      })
+      .catch(() => {
+        if (active) setIsReady(true)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [language])
+
+  return isReady
+}
+```
+
+这里返回 `isReady`，是为了在语言模块加载完成后触发一次重新渲染。否则首次渲染发生在语言注册之前时，代码块可能仍然没有正确高亮。
+
+### 3. 组合使用
+
+最后把文件名识别、语言加载和代码渲染组合起来：
+
+```tsx
+import { Highlight, Prism, themes } from 'prism-react-renderer'
+
+globalThis.Prism = Prism
+
+export function CodeBlock({ code, filename }: { code: string; filename: string }) {
+  const language = getLangFromFileName(filename)
+  const isReady = usePrismLanguageLoader(language)
+
+  if (!isReady) {
+    return <pre>{code}</pre>
+  }
+
+  return (
+    <Highlight Prism={Prism} code={code} language={language} theme={themes.github}>
+      {({ tokens, getLineProps, getTokenProps }) => (
+        <pre>
+          {tokens.map((line, lineIndex) => (
+            <div key={lineIndex} {...getLineProps({ line })}>
+              {line.map((token, tokenIndex) => (
+                <span key={tokenIndex} {...getTokenProps({ token })} />
+              ))}
+            </div>
+          ))}
+        </pre>
+      )}
+    </Highlight>
+  )
+}
+```
+
+如果展示的是超大文件，还可以继续把 Token 行交给虚拟列表，只渲染可视区域和缓冲区里的内容，避免一次创建过多 DOM 节点。
+
+## 总结
+
+`prism-react-renderer` 扩展语言支持的核心并不复杂：
+
+1. 让语言模块和 `<Highlight>` 共享同一个 Prism 实例。
+2. 根据文件名推断语言。
+3. 按需加载并缓存语言定义。
+4. 等语言注册完成后，再渲染对应代码。
+
+真正容易踩坑的地方不是“怎么 import 一个语言包”，而是加载时机、Prism 实例和 React 重新渲染之间的关系。

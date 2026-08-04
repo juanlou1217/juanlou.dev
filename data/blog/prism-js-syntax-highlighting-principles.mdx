@@ -1,0 +1,182 @@
+---
+title: 'Prism.js 代码高亮原理'
+date: '2025-10-03'
+tags: ['javascript', 'prismjs', 'syntax-highlighting', 'frontend']
+category: 'tech'
+draft: false
+summary: '从 Grammar、Tokenizer、Token 树到 HTML 与 CSS，梳理 Prism.js 实现代码高亮的基本过程。'
+authors: ['default']
+layout: PostLayout
+---
+
+> 历史发布：[掘金](https://juejin.cn/post/7556475589269684266) · [CSDN](https://blog.csdn.net/zk031217/article/details/152464868)。
+
+## 发布数据
+
+截至 2026 年 8 月 4 日，两个平台的公开数据如下。不同平台的展现和阅读统计口径不同，这里只作为历史记录。
+
+| 平台 | 展现 | 阅读 | 点赞 | 评论 | 收藏 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 掘金 | 191 | 232 | 0 | 0 | 0 |
+| CSDN | — | 947 | 15 | 0 | 10 |
+
+Prism.js 实现代码高亮，可以先理解成一个“字符串扫描、规则匹配、Token 化、样式渲染”的过程。
+
+它的核心不是依赖浏览器识别代码语法，而是通过每种语言的 Grammar 和正则规则解析源码。
+
+```text
+源代码
+  -> Grammar 规则匹配
+  -> Token 树
+  -> HTML 标记
+  -> CSS 上色
+```
+
+## 语言语法定义：Grammar
+
+Prism.js 会为不同语言定义一套 Grammar，用对象描述不同 Token 类型与匹配规则之间的关系。
+
+常见的 Token 类型包括：
+
+- 注释
+- 字符串
+- 关键字
+- 常量
+- 数值
+- 运算符
+- 标点
+- 函数
+- 属性
+
+下面是一份简化后的 JavaScript Grammar，只用于帮助理解：
+
+```js
+Prism.languages.javascript = {
+  comment: /\/\*[\s\S]*?\*\/|\/\/.*/,
+  string: {
+    pattern: /(["'])(?:\\.|(?!\1)[^\\\r\n])*\1/,
+    greedy: true,
+  },
+  keyword: /\b(?:if|else|for|while|function|return)\b/,
+  number: /\b\d+(?:\.\d+)?\b/,
+  operator: /[+\-*/%=<>!&|]/,
+  punctuation: /[{}[\];(),.:]/,
+}
+```
+
+真实语言定义会复杂得多。除了简单正则，Prism 还支持对象形式的高级规则，例如：
+
+- `greedy`：扩大匹配范围，处理跨 Token 的内容。
+- `lookbehind`：把前置匹配从最终 Token 中排除。
+- `inside`：在当前 Token 内继续应用一套子 Grammar。
+
+像 Markdown 内嵌代码、HTML 中的 `<script>`，都需要依靠嵌套 Grammar 继续解析。
+
+## 解析过程：Tokenizer
+
+Tokenizer 的工作可以概括成：
+
+```text
+输入字符串
+  -> 按 Grammar 查找匹配内容
+  -> 把命中部分包装成 Token
+  -> 保留未命中字符串
+  -> 继续处理剩余内容与嵌套规则
+```
+
+假设输入是：
+
+```js
+if (x > 10) console.log('hi')
+```
+
+当关键字规则匹配到 `if` 时，这段文本会被拆成：
+
+1. `if`：包装成 `Token('keyword', 'if')`。
+2. 空格：仍然是普通字符串。
+3. 剩余代码：继续交给后续规则扫描。
+
+其他规则会继续识别标点、运算符、数字、函数和字符串，最后得到类似下面的 Token 结构：
+
+```text
+[
+  Token('keyword', 'if'),
+  ' ',
+  Token('punctuation', '('),
+  'x',
+  ' ',
+  Token('operator', '>'),
+  ' ',
+  Token('number', '10'),
+  Token('punctuation', ')'),
+  ' ',
+  Token('function', 'console.log'),
+  Token('punctuation', '('),
+  Token('string', "'hi'"),
+  Token('punctuation', ')')
+]
+```
+
+这里可以先记住三个结果：
+
+1. 未匹配的部分仍然保留为普通字符串。
+2. 匹配到的部分会被包装成带类型的 Token。
+3. 如果规则包含 `inside`，Token 内部还会继续形成嵌套结构。
+
+这种基于 Grammar 的反复扫描很灵活，但遇到规则复杂、内容很长的代码文件时，也需要注意解析与渲染成本。
+
+## 渲染过程：从 Token 到 HTML
+
+Token 树生成后，Prism 会把它转换成带 class 的 HTML。简化后可以理解成：
+
+```js
+return `<span class="token ${type}">${content}</span>`
+```
+
+关键字最终可能变成：
+
+```html
+<span class="token keyword">if</span>
+```
+
+Prism 本身负责识别和标记，最终的颜色来自 CSS 主题：
+
+```css
+.token.keyword {
+  color: #cf222e;
+}
+
+.token.string {
+  color: #0a3069;
+}
+```
+
+所以切换高亮主题通常不需要重新解析代码，只要替换对应的 Token 样式即可。
+
+## 和其他代码高亮方案的区别
+
+不同工具解决的问题并不完全相同：
+
+| 特性 | Prism.js | Highlight.js | Monaco / CodeMirror |
+| --- | --- | --- | --- |
+| 主要定位 | 轻量代码展示 | 通用代码高亮与语言检测 | 编辑器级代码交互 |
+| 语言识别 | 通常手动指定 | 支持自动检测 | 通常由编辑器模型指定 |
+| 解析方式 | Grammar + 正则 + Tokenizer | 语言模式 + 正则匹配 | Tokenizer、语法树或语言服务 |
+| 扩展方式 | 自定义 Grammar | 自定义语言定义 | 语言扩展、解析器或语言服务 |
+| 体积与能力 | 相对轻量 | 语言覆盖较广 | 能力更完整，体积也更大 |
+| 适合场景 | 博客、文档、代码片段 | 论坛、Wiki、未知语言内容 | 在线编辑器、IDE 场景 |
+
+Prism.js 更适合“已经知道代码语言，只需要稳定展示”的场景。
+
+如果要处理超大文件、代码编辑、增量解析、自动补全或语言服务，只靠代码高亮库就不够了，通常还要考虑虚拟渲染或编辑器级方案。
+
+## 总结
+
+Prism.js 的代码高亮过程可以概括为：
+
+1. **Grammar 定义**：用规则描述语言里的关键字、字符串、注释等类型。
+2. **Tokenizer 解析**：扫描源码，把匹配内容转换为 Token 树。
+3. **HTML 渲染**：把 Token 转换为带 `.token.xxx` class 的标记。
+4. **CSS 上色**：通过主题样式控制最终视觉效果。
+
+核心就是：**基于 Grammar 的 Tokenization，再通过 HTML 标记和 CSS 完成上色。**

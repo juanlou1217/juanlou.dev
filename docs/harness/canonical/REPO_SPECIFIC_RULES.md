@@ -145,3 +145,16 @@
 5. 需要补哪份 harness 文档来固化这次判断？
 
 如果这 5 个问题没有想清楚，就很容易在这个仓库里做出“看似可用、实际上偏离产品状态”的实现。
+
+## 9. 生产入口由独立 Infra 仓库管理
+
+生产环境的 Caddy、`80/443` 端口、TLS 证书卷和跨应用域名路由统一由私有仓库 `juanlou1217/juanlou-infra` 管理。
+
+本仓库只负责博客应用与 PostgreSQL，不应重新加入：
+
+- `deploy/Caddyfile`
+- Caddy Compose 服务
+- `80/443` 端口映射
+- FreeLLMAPI 或其他应用的域名路由
+
+新增或修改生产域名时，应修改 Infra 仓库；博客容器继续通过共享的 `juanlou-dev_default` 网络供统一入口访问。

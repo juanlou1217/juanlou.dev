@@ -25,22 +25,5 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  caddy:
-    image: docker.m.daocloud.io/library/caddy:2.10-alpine
-    depends_on:
-      - app
-    environment:
-      SITE_DOMAIN: ${SITE_DOMAIN:-juanlou.top}
-    ports:
-      - '80:80'
-      - '443:443'
-    volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    restart: unless-stopped
-
 volumes:
   postgres_data:
-  caddy_data:
-  caddy_config:

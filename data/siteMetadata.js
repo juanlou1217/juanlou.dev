@@ -21,7 +21,7 @@ const siteMetadata = {
   siteLogo: '/static/images/logo-juanlou.svg',
   image: '/static/images/avatar_backup.jpg',
   socialBanner: '/static/images/avatar_backup.jpg',
-  email: '3106444523@qq.com',
+  email: 'juanlou.zhao@gmail.com',
   github: 'https://github.com/juanlou1217',
   locale: 'zh-CN',
   stickyNav: false,

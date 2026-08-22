@@ -7,7 +7,7 @@ const ProfileCardInfo = () => {
   return (
     <div className="p-3">
       <h3 className="text-lg font-medium text-gray-800 dark:text-white">赵康（卷娄）</h3>
-      <h5 className="text-gray-700 dark:text-gray-400">学习ing | 成长ing ｜ INFP</h5>
+      <h5 className="text-gray-700 dark:text-gray-400">学习ing | 成长ing</h5>
       <div className="mt-2 mb-2 space-y-3">
         <div className="flex items-center">
           <Briefcase size={20} strokeWidth={1} />

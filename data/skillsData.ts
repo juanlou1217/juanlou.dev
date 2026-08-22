@@ -12,6 +12,16 @@ const skillsData: SkillAsset[] = [
     featured: true,
     tags: ['求职', '简历', 'Career'],
   },
+  {
+    slug: 'sketchlings',
+    title: 'Sketchlings',
+    description:
+      '一个运行在浏览器里的手绘角色生成器。输入一个名字，它会通过稳定种子生成一只专属小怪物，同一个名字始终对应同一个角色。角色由 Canvas 2D 实时绘制，再用 Three.js 组织眨眼、呼吸、视线跟随和表演动作，整个过程不依赖后端或运行时 AI。',
+    href: 'https://github.com/juanlou1217/sketchlings',
+    category: '创意编程实验',
+    badge: '持续迭代',
+    tags: ['React 19', 'TypeScript', 'Three.js', 'Canvas 2D'],
+  },
 ];
 
 export default skillsData;

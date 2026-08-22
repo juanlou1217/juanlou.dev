@@ -6,7 +6,7 @@ export const EXPERIENCES = [
     url: 'https://jobright.ai',
     logo: '/static/images/experiences/jobright.svg',
     start: '2026年3月',
-    end: '至今',
+    end: '2026年9月',
     title: '前端开发实习生',
     icon: 'man-technologist',
     event: 'career-jobright',
@@ -17,8 +17,12 @@ export const EXPERIENCES = [
             <strong>硅谷 AI 求职平台</strong>，服务北美市场，为求职者提供智能化的职位匹配和简历优化服务。
           </li>
           <li>
-            开发 <strong>浏览器插件自动填充功能</strong>，使用 <strong>React、TypeScript</strong>{' '}
-            实现跨站点表单自动填充， 显著提升求职效率。
+            参与浏览器插件开发，使用 <strong>React、TypeScript</strong>{' '}
+            实现跨站点表单自动填充，帮助用户更高效地完成职位申请。
+          </li>
+          <li>
+            参与官网多个业务模块的开发与维护，覆盖职位推荐、用户引导和产品落地页等场景，并参与{' '}
+            <strong>Orion AI 智能助手</strong>的重构与持续迭代。
           </li>
         </ul>
       );
@@ -29,7 +33,7 @@ export const EXPERIENCES = [
     url: 'https://xuanwu.openatom.cn/',
     logo: '/static/images/experiences/xuanwu.png',
     start: '2025年9月',
-    end: '至今',
+    end: '2026年3月',
     title: '前端开发实习生',
     icon: 'man-technologist',
     event: 'career-xuanwu',

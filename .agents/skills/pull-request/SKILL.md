@@ -1,99 +1,41 @@
 ---
 name: pull-request
-description: Create a draft GitHub pull request following the project template
+description: Push the current feature branch and open a draft GitHub pull request.
 user-invocable: true
 disable-model-invocation: true
 allowed-tools:
   - Bash
   - Read
   - Grep
-argument-hint: '[optional: PR title or target branch]'
+argument-hint: '[optional: PR title or base branch]'
 ---
 
-# Create GitHub Pull Request
+# Pull request
 
-Create a draft pull request using `gh` CLI, following the project's pull_request_template.md format.
+Run this workflow only when the user explicitly invokes it. Creating a pull request is an external side effect and includes the branch push required to create it.
 
-## Process
+## Workflow
 
-1. Run these commands in parallel to understand the current state:
-   - `git status` to see all changes (never use `-uall` flag)
-   - `git branch --show-current` to get current branch name
-   - `git log origin/main..HEAD --oneline` to see commits that will be in the PR
-   - `git diff origin/main...HEAD --stat` to see changed files summary
+1. Inspect `git status`, the current branch, configured remotes, recent commits, and any existing pull request for the branch.
+2. Resolve the base branch in this order: explicit argument, repository default branch from GitHub, then `origin/HEAD`. Do not assume `main`.
+3. Refuse to create a feature pull request from the resolved default/base branch. Never switch branches or rewrite history implicitly.
+4. Review `git log <base>..HEAD`, `git diff <base>...HEAD`, and the repository PR template if one exists.
+5. Keep uncommitted workspace changes out of the PR and report them. Do not auto-commit or sweep unrelated files into the branch.
+6. Run or confirm the checks relevant to the committed diff. Record real results; do not pre-check a template item that was not verified.
+7. Push the current branch with upstream tracking when needed, then create a draft pull request with `gh pr create --draft`.
+8. Read the created PR back, confirm title/base/head/body, and return its URL plus any remaining local changes or failed checks.
 
-2. Read the PR template from `.github/pull_request_template.md`
+## Title and body
 
-3. Check if the current branch tracks a remote:
-   - If not, push with `-u` flag: `git push -u origin <branch-name>`
+- Prefer a Conventional Commit-style title that summarizes the whole PR.
+- Fill the current repository template rather than relying on a memorized version.
+- Explain why, what changed, impact area, and the actual validation performed.
+- Remove placeholder instructions and HTML comments from the submitted body.
+- Use a temporary body file or another quoting-safe mechanism for multiline text.
 
-4. Analyze all commits and changes, then fill in the template sections:
-   - **Summary (Why/What/Solution)**: Based on commit messages and diffs
-   - **Impact Area**: List affected features/components
-   - **Types of Changes**: Mark `[x]` for applicable types based on commits
-   - **Test Plan**: Suggest testing steps
-   - **Checklist**: Pre-check applicable items
-   - **Related Issues**: Leave empty or fill if mentioned in commits
+Treat `$ARGUMENTS` as a title or base-branch hint only when it matches repository state. Add labels, reviewers, assignees, or issue links only when the user supplied them or project automation already defines them.
 
-5. Create the draft PR using HEREDOC format:
+## Safety
 
-```bash
-gh pr create --draft --title "type(scope): description" --body "$(cat <<'EOF'
-<filled template content here>
-EOF
-)"
-```
-
-## PR Title Convention
-
-Use Conventional Commits format:
-
-| Type       | Description                                               |
-| ---------- | --------------------------------------------------------- |
-| `feat`     | A new feature                                             |
-| `fix`      | A bug fix                                                 |
-| `docs`     | Documentation only changes                                |
-| `style`    | Changes that do not affect the meaning of the code        |
-| `refactor` | A code change that neither fixes a bug nor adds a feature |
-| `perf`     | A code change that improves performance                   |
-| `build`    | Changes that affect the build system or external deps     |
-| `ci`       | Changes to CI configuration files and scripts             |
-| `chore`    | Other changes that don't modify src or test files         |
-
-## Mapping Commit Types to PR Types
-
-When filling "Types of Changes" section:
-
-- `feat` → 🚀 New feature
-- `fix` → 🕷 Bug fix
-- `perf` → 👏 Performance optimization
-- `refactor` → 🛠 Refactor
-- `docs` → 📝 Documentation
-- `test` → ✅ Test
-- `build`, `chore` with deps → 📗 Library update
-
-## Arguments
-
-If `$ARGUMENTS` is provided:
-
-- If it looks like a PR title, use it directly
-- If it looks like a branch name (e.g., `main`, `develop`), use it as base branch with `--base`
-
-## Options
-
-Common `gh pr create` options:
-
-- `--base <branch>`: Target branch (default: main)
-- `--assignee @me`: Assign to yourself
-- `--label <name>`: Add labels
-- `--reviewer <handle>`: Request reviewers
-
-## Important
-
-- ALWAYS read `.github/pull_request_template.md` first to get the current template format
-- ALWAYS create PR as draft using `--draft` flag
-- ALWAYS check that you're on the correct branch before creating PR
-- NEVER create PR from `main` or `master` branch
-- ALWAYS ensure changes are pushed to remote before creating PR
-- Remove HTML comments (`<!-- -->`) from the filled template
-- Return the PR URL when done so the user can review and publish when ready
+- Do not force-push, merge, mark ready, deploy, or mutate issues as part of this workflow.
+- If authentication, permissions, branch protection, or CI blocks creation, report the exact blocker and preserve the local branch state.

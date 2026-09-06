@@ -1,385 +1,44 @@
 ---
 name: tech-blog-writer
-description: Draft, polish, and validate technical blog posts for this repository. Use when writing or revising blog articles, installation guides, project walkthroughs, AI collaboration articles, or MDX content for data/blog. Optimized for this blog's structure, category rules, and the active author style profile when available.
+description: Write or revise MDX posts in data/blog for technical tutorials, project walkthroughs, and personal reflections; not ordinary UI copy.
 ---
 
-# Tech Blog Writer
+# Tech blog writer
 
-Use this skill when the task is to write, rewrite, polish, or structure a blog post for this repository, especially for:
+Use this skill for new or existing blog posts in this repository. Preserve the author's ideas and voice while making the article clear, accurate, and compatible with the content pipeline.
 
-- technical sharing posts
-- project walkthroughs
-- installation/setup articles
-- AI collaboration or workflow articles
-- MDX posts under `data/blog/`
+## Load context progressively
 
-This skill is repo-specific. It assumes the output should fit this blog's existing content model and the author's tone.
+1. Read the target draft, source notes, or nearby post that the user named.
+2. Resolve one voice source in this order: `docs/style/PERSONA_PROFILE.md`, `docs/style/VOICE_AND_STYLE.md`, then `data/authors/default.mdx`. Do not load every style or project document.
+3. Read `references/repo-content.md` for a new MDX file, frontmatter work, or claims about current repository capabilities.
+4. Read `references/reflection-writing.md` only for personal reflection or spoken-note material.
+5. Read `references/polish-checklist.md` only for the final editing pass.
+6. Inspect relevant code or package scripts when the post makes implementation claims. Current code outranks prose documentation.
 
-## Style profile resolution
-
-Before writing, resolve the author's style in this order:
-
-1. `docs/style/PERSONA_PROFILE.md` if it exists
-2. `docs/style/VOICE_AND_STYLE.md` if it exists
-3. `data/authors/default.mdx`
-4. homepage self-introduction components and public project docs
-
-Rules:
-
-- Only read private or shared style contracts from `docs/style/`
-- Do not scan other docs directories for style files
-- Use `data/authors/default.mdx` and homepage/project copy only as fallback context
-
-Treat the highest-priority existing file in `docs/style/` as the main style contract for tone, rhythm, taste, and what the writing should feel like.
-
-This lets the same skill adapt across different repositories and different authors without hardcoding one voice.
-
-## What to check first
-
-Before drafting or editing, read only the files you need:
-
-- the resolved style profile file from `Style profile resolution`
-- `AGENTS.md`
-- `docs/project/PROJECT_INTRODUCTION.md`
-- `docs/project/SETUP_GUIDE.md`
-- `docs/project/AI_COLLABORATION_GUIDE.md`
-- `docs/project/BLOG_BUILDING_GUIDE.md` when the topic is project setup or technical sharing
-- `docs/guides/CONTENT_UPDATE_GUIDE.md` when creating a new MDX post
-
-If the article describes implementation details, also inspect the relevant code paths before writing. Do not invent repository behavior.
-
-## Output targets
-
-### When creating a new post
-
-Write an MDX file under `data/blog/` with valid frontmatter. Follow current repo conventions:
-
-- `title`
-- `date`
-- `tags`
-- `category`
-- `draft`
-- `summary`
-- `authors`
-- `layout`
-
-Category should usually be:
-
-- `tech` for technical sharing
-- `life` for reflection or personal growth
-- `essay` for shorter essays
-
-Default technical articles to `category: 'tech'`.
-
-Use:
-
-- `authors: ['default']`
-- `layout: PostLayout`
-
-unless the user explicitly wants something else.
-
-### When polishing an existing post
-
-Preserve:
-
-- the original thesis
-- factual claims that match the repo
-- frontmatter shape unless there is a clear issue
-- the author's existing rhythm, warmth, jokes, and small imperfect phrases when they already feel natural
-
-Improve:
-
-- structure
-- clarity
-- paragraph rhythm
-- heading hierarchy
-- readability for the intended audience
-
-Use a light-touch editing mode by default. Do not paste the newest personality summary, insight, or framework directly onto an existing article, homepage, or about page. Start from what is already working, then make small repairs, bridge transitions, trim rough repetition, and add only the missing detail that helps the original voice land better.
-
-For personal reflection posts, especially when the source is a raw voice-note-like dump, do not over-sanitize the writing into a neat essay. The goal is not to convert the author into a formal columnist. Preserve the author's live thinking: the surprise, embarrassment, excitement, self-correction, unfinished phrasing, and sudden but meaningful leaps. Improve structure around that energy instead of replacing it.
-
-## Author voice and style adaptation
-
-First follow the resolved style profile. Use the rules below as the fallback baseline when the profile is missing or incomplete.
-
-Fallback voice:
-
-- direct
-- practical
-- grounded in real tradeoffs
-- clear enough for beginners
-- technical without showing off
-
-Prefer:
-
-- short declarative sentences
-- concrete reasoning
-- explicit tradeoffs
-- natural first-person reflections when useful
-
-Avoid:
-
-- inflated marketing tone
-- vague praise of tools
-- generic “AI will change everything” filler
-- overly academic or overly sales-like phrasing
-- stacking too many buzzwords in one paragraph
-
-Good fit:
-
-- “我为什么这样选”
-- “这件事真正解决了什么问题”
-- “如果你是刚接触 AI 的同学，可以先这样做”
-
-Bad fit:
-
-- “革命性提升生产力”
-- “颠覆式工作流”
-- empty trend-chasing claims with no repo context
-
-When a style profile exists, extract and respect:
-
-- preferred level of warmth vs restraint
-- whether the author likes first-person reflection
-- whether the author prefers tutorial tone, essay tone, or mixed tone
-- what the author considers too templated, too official, or too commercial
-- visual and structural taste when describing projects or page sections
-
-Do not flatten the output into a generic “good technical article” if the style profile asks for something more personal or more opinionated.
-
-When updating existing personal copy, treat the current page or article as the source of truth for tone. The goal is not to overwrite it with a fresher summary of the author, but to let the author's newer understanding grow out of the old wording naturally. Prefer small sentence-level edits over full-section replacement unless the user explicitly asks for a rewrite.
-
-## Personal reflection writing
-
-Use this section when writing or revising life/work/growth reflection posts from the author's spoken notes.
-
-### Core goal
-
-Create an article that has:
-
-- a clear main thread
-- readable heading hierarchy
-- preserved personal tone and emotional color
-- enough raw life and thought-energy that it still feels like the author
-
-Do not optimize only for smoothness. A piece can be structurally clear while still sounding alive.
-
-### Preserve the author's live voice
-
-When source notes contain vivid or emotionally specific lines, keep them unless they truly break readability. These lines often carry the author's real voice better than polished summaries.
-
-Preserve lines like:
-
-- “大家真的都好牛”
-- “我还是有点拘谨”
-- “想到自己和这么厉害的人在一个公司里工作，会觉得这件事本身就很厉害”
-- “我不是没有想法，而是想法拆不细”
-- “我经常在开口之前就把自己按住了”
-
-You may clean obvious speech artifacts, but do not remove the feeling underneath. Keep some first-person hesitations, self-corrections, and emotionally loaded observations when they reveal the author's real state.
-
-Avoid replacing vivid lines with colder abstractions:
-
-- Bad: “我感受到组织中存在高水平人才密度。”
-- Better: “看到公司里这么多厉害的人，我一方面觉得很兴奋，另一方面也会更拘谨。”
-
-### Structure without killing energy
-
-Use headings to guide the reader, not to turn every paragraph into a thesis statement.
-
-For reflective posts, prefer a three-level rhythm:
-
-1. Main route: 2 to 4 large sections that explain the movement of thought
-2. Local anchors: smaller headings that clarify subtopics
-3. Voice paragraphs: personal, sensory, emotional, or slightly messy paragraphs that keep the article alive
-
-Good large-section routes include:
-
-- `自我 -> 环境 -> 破局`
-- `感受 -> 反思 -> 行动`
-- `现象 -> 问题 -> 方法`
-- `聊天内容 -> 我的理解 -> 下周行动`
-
-Do not make every `##` a climax. Use `##` for the main route and `###` for supporting ideas. If every heading sounds like a final lesson, the article becomes tiring.
-
-### Keep hierarchy of importance
-
-Before rewriting, identify:
-
-- the central emotional trigger
-- the main self-recognition
-- the external framework or company/business insight
-- the actual next action
-
-Then decide which parts deserve expansion. Do not spend equal length on every minor idea. If the user says a section is secondary, keep it as support rather than turning it into the article's center.
-
-### Work from raw notes carefully
-
-When processing a long spoken note:
-
-1. Extract the user's original emotional peaks and keep representative wording.
-2. Identify the article route in one sentence.
-3. Group ideas under the route before polishing sentence-level details.
-4. Preserve at least several original-feeling sentences in each major section.
-5. Only then smooth transitions and remove repetition.
-
-If a rewrite becomes too clean, add back concrete moments, names, scenes, and personal reactions from the source notes.
+Read `docs/guides/CONTENT_UPDATE_GUIDE.md` only when the task includes publishing workflow or asset conventions.
 
 ## Writing workflow
 
-### 1. Lock the article goal
+1. Identify the article type, intended reader, one central takeaway, and the evidence available.
+2. For an existing post, default to light-touch edits: preserve the thesis, factual claims that remain true, frontmatter shape, rhythm, humor, and useful imperfections.
+3. For a new post, outline two to four main sections before drafting. Let the structure follow the material rather than forcing a universal template.
+4. Ground technical writing in real paths, commands, decisions, and tradeoffs. Explain unfamiliar assumptions for beginner readers without padding the article with generic AI claims.
+5. Verify every repository-specific claim that could have changed. Never describe disabled or placeholder capabilities as production-ready.
+6. Polish only after the facts and main thread are stable.
 
-Identify:
+## Voice baseline
 
-- target reader
-- article type
-- one primary takeaway
-- 2 to 4 supporting sections
+The selected voice profile is authoritative. When it is absent or incomplete, write in a direct, practical, beginner-friendly voice with concrete first-person reasoning where useful.
 
-If the request is broad, narrow it before drafting. A good article usually has one core thread, not five.
+Prefer short declarative sentences, specific tradeoffs, and natural transitions. Avoid marketing language, trend slogans, academic inflation, generic praise, and a uniformly polished tone that erases the author's personality.
 
-### 2. Build the outline first
+## Output and validation
 
-For technical posts in this repo, prefer:
+- New posts belong under `data/blog/` and must follow the current Contentlayer schema and nearby MDX conventions.
+- Preserve valid user-supplied dates and facts; do not invent publication history, metrics, quotes, or personal experience.
+- Confirm referenced paths and commands locally.
+- Run `pnpm build` after creating or structurally changing MDX when feasible. For a wording-only edit, report a lighter validation if a full build adds no value.
+- Local writing does not authorize publishing, committing, pushing, or creating a pull request.
 
-1. Problem or motivation
-2. Architecture or structure
-3. Setup or implementation steps
-4. Rules, tradeoffs, or lessons learned
-5. Closing reflection
-
-For beginner-friendly AI posts, explicitly include:
-
-- what AI can help with
-- what AI should not guess
-- how to give repo context
-- how to iterate safely
-
-### 3. Draft from facts, not from abstraction
-
-Anchor the article in:
-
-- actual directories
-- actual routes
-- actual commands
-- actual docs
-- actual constraints from this repo
-
-If a statement depends on current code, verify it locally before writing it.
-
-### 4. Polish for readability
-
-During revision, tighten:
-
-- long openings
-- repetitive sentence starts
-- sections that drift away from the core point
-- jargon that a newcomer would not understand
-
-Add short transition lines when a section jump feels abrupt.
-
-### 5. Validate the post against the repo
-
-Before finishing:
-
-- confirm paths exist
-- confirm commands match package scripts
-- confirm features described as open are actually open
-- confirm disabled or placeholder features are not described as production-ready
-
-If you create or edit MDX, run a content build when feasible.
-
-## Repo-specific guardrails
-
-Do not casually describe these as active product areas unless the user explicitly asks to revive them:
-
-- `/projects`
-- complex `lab` demos
-- newsletter
-- i18n
-
-When discussing the product surface, align with the current public mainline:
-
-- homepage
-- blog list
-- blog detail
-- category pages
-- tags
-- about
-- RSS
-- comments
-- stats
-- GitHub repo info
-
-## Structure patterns
-
-### Pattern A: Project walkthrough
-
-Use this for “这个项目是怎么搭起来的” posts:
-
-1. Why I built it this way
-2. Core stack and why
-3. Project structure
-4. Data flow
-5. Local setup
-6. AI collaboration rules
-7. Lessons learned
-
-### Pattern B: Beginner-friendly AI workflow post
-
-Use this for “AI 小白怎么上手” posts:
-
-1. Common beginner mistake
-2. What context AI actually needs
-3. Minimal repo docs to provide
-4. Safe step-by-step collaboration pattern
-5. Example prompts
-6. What to verify manually
-
-### Pattern C: Installation guide article
-
-Use this for setup-heavy content:
-
-1. What the project is
-2. Required environment
-3. Install dependencies
-4. Configure environment variables
-5. Initialize database
-6. Start dev server
-7. Verify pages and APIs
-8. Common issues
-
-## MDX style rules
-
-Prefer:
-
-- `##` and `###` headings with clear progression
-- fenced code blocks with language tags
-- short bullet lists when enumerating steps or rules
-- short intro and short conclusion
-
-Avoid:
-
-- very deep heading nesting
-- giant bullet walls with no prose
-- oversized code dumps unless the code is central to the point
-
-## Editing checklist
-
-Before finishing, review for:
-
-- Does the title make a concrete promise
-- Does the summary match the real content
-- Is the opening clear within the first 2 paragraphs
-- Does each section earn its place
-- Does the final tone match the resolved style profile instead of a generic template voice
-- Are repo-specific facts accurate
-- Would a newcomer know what to do next
-
-## Example asks this skill should handle well
-
-- “为技术分享栏目写一篇介绍博客结构和安装的文章”
-- “把这篇技术文章润色得更像我自己的口吻”
-- “基于当前仓库写一篇 AI 协作入门文章”
-- “把这篇草稿整理成可发布的 MDX 博文”
+The post is done when its main point is clear, its frontmatter is valid, repository claims are verified, the selected voice remains recognizable, and relevant validation has passed or its limitation is stated.

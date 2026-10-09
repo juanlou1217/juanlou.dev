@@ -16,7 +16,6 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
-      actions: read
     env:
       DEPLOY_HOST: ${{ secrets.PROD_HOST }}
       DEPLOY_USER: ${{ secrets.PROD_USER }}
@@ -26,7 +25,6 @@ jobs:
       POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
       POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
       APP_IMAGE: localhost/juanlou-dev_app:latest
-      APP_IMAGE_ARCHIVE: app-image.tar.gz
       GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
       NEXT_PUBLIC_GISCUS_REPO: ${{ secrets.NEXT_PUBLIC_GISCUS_REPO }}
       NEXT_PUBLIC_GISCUS_REPOSITORY_ID: ${{ secrets.NEXT_PUBLIC_GISCUS_REPOSITORY_ID }}
@@ -57,34 +55,9 @@ jobs:
             ServerAliveCountMax 4
           EOF
 
-      - name: Build production image
-        run: |
-          docker build -t "$APP_IMAGE" .
-          docker save "$APP_IMAGE" | gzip -1 > "$APP_IMAGE_ARCHIVE"
-          ls -lh "$APP_IMAGE_ARCHIVE"
-          sha256sum "$APP_IMAGE_ARCHIVE" > "$APP_IMAGE_ARCHIVE.sha256"
-
-      - name: Store production image
-        id: image-artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-image
-          path: app-image.tar.gz
-          compression-level: 0
-          retention-days: 1
-          if-no-files-found: error
-
-      - name: Deploy to server
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ARTIFACT_ID: ${{ steps.image-artifact.outputs.artifact-id }}
+      - name: Prepare production source
         run: |
           DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
-          POSTGRES_USER="${POSTGRES_USER:-postgres}"
-          POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
-          POSTGRES_DB="${POSTGRES_DB:-juanlou_blog}"
-          POSTGRES_URL="${POSTGRES_URL:-postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB}"
-
           ssh "$DEPLOY_USER@$DEPLOY_HOST" "
             set -euo pipefail
             export DEBIAN_FRONTEND=noninteractive
@@ -104,32 +77,32 @@ jobs:
             cd '$DEPLOY_PATH'
             git fetch origin main
             git checkout main
-            git reset --hard origin/main
+            git reset --hard '${{ github.sha }}'
           "
 
-          artifact_url=$(curl --fail --silent --show-error --output /dev/null --write-out '%{redirect_url}' \
-            --header "Authorization: Bearer $GH_TOKEN" \
-            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip")
-          test -n "$artifact_url"
-          echo "::add-mask::$artifact_url"
-          echo 'Downloading compressed image on the server over HTTPS'
-          printf '%s\n' "$artifact_url" | ssh "$DEPLOY_USER@$DEPLOY_HOST" "
-            set -euo pipefail
-            read -r download_url
-            cd '$DEPLOY_PATH'
-            curl --fail --silent --show-error --location --connect-timeout 15 --max-time 300 \
-              --speed-limit 1024 --speed-time 30 --output image-artifact.zip.part \
-              --write-out 'Downloaded %{size_download} bytes at %{speed_download} bytes/sec\\n' \
-              \"\$download_url\"
-            python3 -c \"import zipfile; zipfile.ZipFile('image-artifact.zip.part').extract('$APP_IMAGE_ARCHIVE', '.')\"
-            rm image-artifact.zip.part
-          "
+      - name: Build production image on server
+        timeout-minutes: 20
+        run: |
+          DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
           ssh "$DEPLOY_USER@$DEPLOY_HOST" "
             set -euo pipefail
             cd '$DEPLOY_PATH'
-            sha256sum -c -
-          " < "$APP_IMAGE_ARCHIVE.sha256"
-          echo 'Image download and checksum verification completed'
+            free -m
+            df -h .
+            if command -v podman >/dev/null 2>&1; then
+              podman build --layers -t '$APP_IMAGE' .
+            else
+              docker build -t '$APP_IMAGE' .
+            fi
+          "
+
+      - name: Deploy to server
+        run: |
+          DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
+          POSTGRES_USER="${POSTGRES_USER:-postgres}"
+          POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
+          POSTGRES_DB="${POSTGRES_DB:-juanlou_blog}"
+          POSTGRES_URL="${POSTGRES_URL:-postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB}"
 
           ssh "$DEPLOY_USER@$DEPLOY_HOST" "cat > '$DEPLOY_PATH/.env.production'" <<EOF
           POSTGRES_USER=$POSTGRES_USER
@@ -137,7 +110,7 @@ jobs:
           POSTGRES_DB=$POSTGRES_DB
           POSTGRES_URL=$POSTGRES_URL
           APP_IMAGE=$APP_IMAGE
-          APP_IMAGE_ARCHIVE=$DEPLOY_PATH/$APP_IMAGE_ARCHIVE
+          APP_IMAGE_ARCHIVE=
           GITHUB_API_TOKEN=$GITHUB_API_TOKEN
           NEXT_PUBLIC_GISCUS_REPO=$NEXT_PUBLIC_GISCUS_REPO
           NEXT_PUBLIC_GISCUS_REPOSITORY_ID=$NEXT_PUBLIC_GISCUS_REPOSITORY_ID

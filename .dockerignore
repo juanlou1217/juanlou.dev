@@ -30,10 +30,12 @@ Dockerfile
 docker-compose.yml
 
 # Environment files
-.env*.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env
+.env.*
+
+# Deployment archives on the production host
+app-image.tar*
+image-artifact.zip*
 
 # Documentation
 README.md

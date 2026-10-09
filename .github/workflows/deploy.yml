@@ -16,6 +16,7 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
+      actions: read
     env:
       DEPLOY_HOST: ${{ secrets.PROD_HOST }}
       DEPLOY_USER: ${{ secrets.PROD_USER }}
@@ -63,7 +64,20 @@ jobs:
           ls -lh "$APP_IMAGE_ARCHIVE"
           sha256sum "$APP_IMAGE_ARCHIVE" > "$APP_IMAGE_ARCHIVE.sha256"
 
+      - name: Store production image
+        id: image-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-image
+          path: app-image.tar.gz
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
+
       - name: Deploy to server
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.image-artifact.outputs.artifact-id }}
         run: |
           DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
           POSTGRES_USER="${POSTGRES_USER:-postgres}"
@@ -93,18 +107,29 @@ jobs:
             git reset --hard origin/main
           "
 
-          echo 'Uploading compressed image (SFTP, at most 5 minutes)'
-          if ! timeout 300 scp "$APP_IMAGE_ARCHIVE" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/$APP_IMAGE_ARCHIVE.part"; then
-            echo 'SFTP transfer failed or timed out; retrying with SCP (at most 5 minutes)'
-            timeout 300 scp -O "$APP_IMAGE_ARCHIVE" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/$APP_IMAGE_ARCHIVE.part"
-          fi
+          artifact_url=$(curl --fail --silent --show-error --output /dev/null --write-out '%{redirect_url}' \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip")
+          test -n "$artifact_url"
+          echo "::add-mask::$artifact_url"
+          echo 'Downloading compressed image on the server over HTTPS'
+          printf '%s\n' "$artifact_url" | ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            read -r download_url
+            cd '$DEPLOY_PATH'
+            curl --fail --silent --show-error --location --connect-timeout 15 --max-time 300 \
+              --speed-limit 1024 --speed-time 30 --output image-artifact.zip.part \
+              --write-out 'Downloaded %{size_download} bytes at %{speed_download} bytes/sec\\n' \
+              \"\$download_url\"
+            python3 -c \"import zipfile; zipfile.ZipFile('image-artifact.zip.part').extract('$APP_IMAGE_ARCHIVE', '.')\"
+            rm image-artifact.zip.part
+          "
           ssh "$DEPLOY_USER@$DEPLOY_HOST" "
             set -euo pipefail
             cd '$DEPLOY_PATH'
-            mv '$APP_IMAGE_ARCHIVE.part' '$APP_IMAGE_ARCHIVE'
             sha256sum -c -
           " < "$APP_IMAGE_ARCHIVE.sha256"
-          echo 'Image upload and checksum verification completed'
+          echo 'Image download and checksum verification completed'
 
           ssh "$DEPLOY_USER@$DEPLOY_HOST" "cat > '$DEPLOY_PATH/.env.production'" <<EOF
           POSTGRES_USER=$POSTGRES_USER

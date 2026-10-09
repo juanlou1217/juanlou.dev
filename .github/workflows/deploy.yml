@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: production-deploy
+  group: production-diagnostics
   cancel-in-progress: true
 
 jobs:
@@ -59,9 +59,8 @@ jobs:
       - name: Diagnose production transfer
         run: |
           ssh "$DEPLOY_USER@$DEPLOY_HOST" '
-            df -h /opt /var/tmp
-            ls -lh /opt/juanlou-dev/app-image.tar*
-            command -v curl unzip python3 rsync podman docker || true
-            podman ps --format "{{.Names}} {{.Status}}"
-            curl -L --max-time 30 -s -o /dev/null -w "github_https_status=%{http_code} bytes=%{size_download} speed=%{speed_download}\n" https://github.com/juanlou1217/juanlou.dev/archive/refs/heads/main.tar.gz
+            free -m
+            df -h /opt
+            ps -eo comm,pcpu,pmem,rss --sort=-pcpu | head -12
+            podman images --format "{{.Repository}} {{.CreatedAt}} {{.Size}}" | head -10
           '

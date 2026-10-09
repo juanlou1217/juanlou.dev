@@ -16,6 +16,7 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
+      actions: read
     env:
       DEPLOY_HOST: ${{ secrets.PROD_HOST }}
       DEPLOY_USER: ${{ secrets.PROD_USER }}
@@ -55,78 +56,30 @@ jobs:
             ServerAliveCountMax 4
           EOF
 
-      - name: Prepare production source
+      - name: Recover production from verified artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
-            set -euo pipefail
-            export DEBIAN_FRONTEND=noninteractive
-            if ! command -v git >/dev/null 2>&1; then
-              if command -v apt-get >/dev/null 2>&1; then
-                apt-get update && apt-get install -y git
-              elif command -v dnf >/dev/null 2>&1; then
-                dnf install -y git
-              else
-                yum install -y git
-              fi
-            fi
-            mkdir -p '$DEPLOY_PATH'
-            if [ ! -d '$DEPLOY_PATH/.git' ]; then
-              git clone --depth 1 'https://github.com/${{ github.repository }}.git' '$DEPLOY_PATH'
-            fi
-            cd '$DEPLOY_PATH'
-            git fetch origin main
-            git checkout main
-            git reset --hard '${{ github.sha }}'
-          "
-
-      - name: Build production image on server
-        timeout-minutes: 20
-        run: |
-          DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "cat > '$DEPLOY_PATH/download-artifact.py'" < scripts/deploy/download-artifact.py
+          artifact_url=$(curl --fail --silent --show-error --output /dev/null --write-out '%{redirect_url}' \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/11599321593/zip")
+          test -n "$artifact_url"
+          echo "::add-mask::$artifact_url"
+          printf '%s\n' "$artifact_url" | ssh "$DEPLOY_USER@$DEPLOY_HOST" "
             set -euo pipefail
             cd '$DEPLOY_PATH'
-            free -m
-            df -h .
-            if command -v podman >/dev/null 2>&1; then
-              podman build --layers -t '$APP_IMAGE' .
-            else
-              docker build -t '$APP_IMAGE' .
-            fi
-          "
-
-      - name: Deploy to server
-        run: |
-          DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
-          POSTGRES_USER="${POSTGRES_USER:-postgres}"
-          POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
-          POSTGRES_DB="${POSTGRES_DB:-juanlou_blog}"
-          POSTGRES_URL="${POSTGRES_URL:-postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB}"
-
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "cat > '$DEPLOY_PATH/.env.production'" <<EOF
-          POSTGRES_USER=$POSTGRES_USER
-          POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-          POSTGRES_DB=$POSTGRES_DB
-          POSTGRES_URL=$POSTGRES_URL
-          APP_IMAGE=$APP_IMAGE
-          APP_IMAGE_ARCHIVE=
-          GITHUB_API_TOKEN=$GITHUB_API_TOKEN
-          NEXT_PUBLIC_GISCUS_REPO=$NEXT_PUBLIC_GISCUS_REPO
-          NEXT_PUBLIC_GISCUS_REPOSITORY_ID=$NEXT_PUBLIC_GISCUS_REPOSITORY_ID
-          NEXT_PUBLIC_GISCUS_CATEGORY=$NEXT_PUBLIC_GISCUS_CATEGORY
-          NEXT_PUBLIC_GISCUS_CATEGORY_ID=$NEXT_PUBLIC_GISCUS_CATEGORY_ID
-          UMAMI_WEBSITE_ID=$UMAMI_WEBSITE_ID
-          UMAMI_SHARE_URL=$UMAMI_SHARE_URL
-          EOF
-
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
-            set -euo pipefail
+            pkill -TERM -f '^podman build --layers -t localhost/juanlou-dev_app:latest [.]$' || true
+            timeout 480 python3 download-artifact.py 109425534 34443b46de1d235d82c8ec132a9458cc21695b1121ab73d9c2dfd33da0a309a6 recovered-image.zip
+            python3 -c \"import zipfile; zipfile.ZipFile('recovered-image.zip').extract('app-image.tar.gz', '.')\"
+            test -f .env.production
+            sed -i 's|^APP_IMAGE_ARCHIVE=.*|APP_IMAGE_ARCHIVE=$DEPLOY_PATH/app-image.tar.gz|' .env.production
             export APP_DIR='$DEPLOY_PATH'
-            cd '$DEPLOY_PATH'
             bash scripts/deploy/remote-bootstrap.sh
           "
 
-      - name: Verify public site
+      - name: Verify published article
         run: |
-          curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors --max-time 20 https://juanlou.top/ -o /dev/null
+          curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors --max-time 20 https://juanlou.top/blog/family-face-personal-cost -o /tmp/article.html
+          grep -q '面子是全家的' /tmp/article.html

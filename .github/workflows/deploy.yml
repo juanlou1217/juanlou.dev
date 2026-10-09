@@ -62,5 +62,6 @@ jobs:
             free -m
             df -h /opt
             ps -eo comm,pcpu,pmem,rss --sort=-pcpu | head -12
+            ps -eo comm,args | grep -E "^(MainThread|node|pnpm|next) " || true
             podman images --format "{{.Repository}} {{.CreatedAt}} {{.Size}}" | head -10
           '

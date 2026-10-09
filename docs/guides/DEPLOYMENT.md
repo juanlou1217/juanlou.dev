@@ -18,6 +18,8 @@
 - `docker-compose.prod.yml`
 - `scripts/deploy/remote-bootstrap.sh`
 
+CI 构建后将镜像压缩为 `app-image.tar.gz` 再传输。默认使用 SFTP，单次最多等待 5 分钟；失败或超时后使用 SCP 协议重试一次，最多再等待 5 分钟。上传文件先使用 `.part` 后缀，传输成功并通过 SHA-256 校验后才交给服务器加载。部署结束后会检查公网首页是否可访问；发布文章时，还需要确认文章正文与列表已更新。
+
 ## 首次上线前提
 
 1. `juanlou.top` 的 A 记录指向生产服务器

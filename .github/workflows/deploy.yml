@@ -25,7 +25,7 @@ jobs:
       POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
       POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
       APP_IMAGE: localhost/juanlou-dev_app:latest
-      APP_IMAGE_ARCHIVE: app-image.tar
+      APP_IMAGE_ARCHIVE: app-image.tar.gz
       GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
       NEXT_PUBLIC_GISCUS_REPO: ${{ secrets.NEXT_PUBLIC_GISCUS_REPO }}
       NEXT_PUBLIC_GISCUS_REPOSITORY_ID: ${{ secrets.NEXT_PUBLIC_GISCUS_REPOSITORY_ID }}
@@ -48,11 +48,20 @@ jobs:
           printf '%s\n' "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config <<EOF
+          Host *
+            BatchMode yes
+            ConnectTimeout 15
+            ServerAliveInterval 15
+            ServerAliveCountMax 4
+          EOF
 
       - name: Build production image
         run: |
           docker build -t "$APP_IMAGE" .
-          docker save "$APP_IMAGE" -o "$APP_IMAGE_ARCHIVE"
+          docker save "$APP_IMAGE" | gzip -1 > "$APP_IMAGE_ARCHIVE"
+          ls -lh "$APP_IMAGE_ARCHIVE"
+          sha256sum "$APP_IMAGE_ARCHIVE" > "$APP_IMAGE_ARCHIVE.sha256"
 
       - name: Deploy to server
         run: |
@@ -84,7 +93,18 @@ jobs:
             git reset --hard origin/main
           "
 
-          scp "$APP_IMAGE_ARCHIVE" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/$APP_IMAGE_ARCHIVE"
+          echo 'Uploading compressed image (SFTP, at most 5 minutes)'
+          if ! timeout 300 scp "$APP_IMAGE_ARCHIVE" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/$APP_IMAGE_ARCHIVE.part"; then
+            echo 'SFTP transfer failed or timed out; retrying with SCP (at most 5 minutes)'
+            timeout 300 scp -O "$APP_IMAGE_ARCHIVE" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/$APP_IMAGE_ARCHIVE.part"
+          fi
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            cd '$DEPLOY_PATH'
+            mv '$APP_IMAGE_ARCHIVE.part' '$APP_IMAGE_ARCHIVE'
+            sha256sum -c -
+          " < "$APP_IMAGE_ARCHIVE.sha256"
+          echo 'Image upload and checksum verification completed'
 
           ssh "$DEPLOY_USER@$DEPLOY_HOST" "cat > '$DEPLOY_PATH/.env.production'" <<EOF
           POSTGRES_USER=$POSTGRES_USER
@@ -108,3 +128,7 @@ jobs:
             cd '$DEPLOY_PATH'
             bash scripts/deploy/remote-bootstrap.sh
           "
+
+      - name: Verify public site
+        run: |
+          curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors --max-time 20 https://juanlou.top/ -o /dev/null

@@ -1,6 +1,11 @@
-name: Inspect Music Integration
+name: Prepare Music Integration
 on:
   workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [setup, login, verify]
+        default: verify
 permissions:
   contents: read
 jobs:
@@ -13,13 +18,59 @@ jobs:
           PROD_HOST: ${{ secrets.PROD_HOST }}
           PROD_USER: ${{ secrets.PROD_USER }}
           PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+          MUSIC_BUNDLE: ${{ secrets.MUSIC_INFRA_BUNDLE }}
+          OPERATION: ${{ inputs.operation }}
         run: |
           umask 077
           mkdir -p ~/.ssh
           printf '%s\n' "$PROD_SSH_KEY" > ~/.ssh/id_ed25519
           ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts
-          ssh -o BatchMode=yes -o ConnectTimeout=15 "$PROD_USER@$PROD_HOST" 'bash -s' <<'REMOTE'
-          set -eu
-          podman exec folia_qq-api_1 node -e 'const fs=require("fs");const p="/app/node_modules/@yakult-green-tea/qq-music-api";console.log("PACKAGE",require(p+"/package.json").version);for(const k of ["QQ_AUTH_SESSION_PATH","QQ_AUTH_STATE_PATH","QQ_SESSION_SECRET"]) console.log(k,k.endsWith("SECRET")?Boolean(process.env[k]):process.env[k]);console.log("STATE_FILES",fs.readdirSync("/app/.auth-state"));'
-          podman exec folia_qq-api_1 sh -c 'find /app/node_modules/@yakult-green-tea/qq-music-api/dist -type f | grep -E "session|Session|repository|Repository|playlist" | head -45'
+          if [ "$OPERATION" = setup ]; then
+            printf '%s' "$MUSIC_BUNDLE" | base64 -d > music.tar.gz
+            scp music.tar.gz "$PROD_USER@$PROD_HOST:/tmp/music-infra.tar.gz"
+            ssh "$PROD_USER@$PROD_HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          umask 077
+          backup=/opt/backups/music-integration-$(date -u +%Y%m%dT%H%M%SZ)
+          mkdir -p "$backup"
+          tar -czf "$backup/infra-config.tar.gz" -C /opt juanlou-infra
+          cp /opt/juanlou-dev/.env.production "$backup/blog.env.production"
+          cp /opt/juanlou-dev/docker-compose.prod.yml "$backup/blog-compose.yml"
+          podman inspect juanlou-dev_app_1 --format '{{.Image}}' > "$backup/blog-image-id"
+          podman tag "$(cat "$backup/blog-image-id")" localhost/juanlou-blog:before-music
+          tar -xzf /tmp/music-infra.tar.gz -C /opt/juanlou-infra
+          rm /tmp/music-infra.tar.gz
+          bash /opt/juanlou-infra/music/deploy.sh
+          echo "BACKUP=$backup"
           REMOTE
+          elif [ "$OPERATION" = login ]; then
+            ssh "$PROD_USER@$PROD_HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          install -d -m 700 -o 10001 -g 10001 /opt/juanlou-infra-secrets/music-handoff
+          podman rm -f blog-music-login >/dev/null 2>&1 || true
+          podman run -d --name blog-music-login --network folia_internal --user 10001:10001 --read-only --cap-drop ALL --security-opt no-new-privileges --memory 192m \
+            -v /opt/juanlou-infra/music:/music:ro -v /opt/juanlou-infra-secrets/music:/secrets \
+            -v /opt/juanlou-infra-secrets/music-handoff:/handoff \
+            --entrypoint node localhost/folia-qq-api:005c56620e07 /music/login.mjs >/dev/null
+          for i in $(seq 1 30); do
+            test ! -f /opt/juanlou-infra-secrets/music-handoff/qr.png || exit 0
+            sleep 1
+          done
+          podman logs blog-music-login
+          exit 1
+          REMOTE
+            scp "$PROD_USER@$PROD_HOST:/opt/juanlou-infra-secrets/music-handoff/qr.png" qr.png
+          else
+            ssh "$PROD_USER@$PROD_HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          podman logs blog-music-login 2>/dev/null || true
+          podman exec blog-music node -e 'fetch("http://127.0.0.1:3100/collection").then(async r=>{console.log("COLLECTION_STATUS",r.status);const d=await r.json();console.log(JSON.stringify(d));})'
+          podman ps --format '{{.Names}} {{.Status}}'
+          REMOTE
+          fi
+      - uses: actions/upload-artifact@v4
+        if: inputs.operation == 'login'
+        with:
+          name: music-admin-qr
+          path: qr.png
+          retention-days: 1

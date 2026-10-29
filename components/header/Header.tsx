@@ -38,7 +38,7 @@ const Header = () => {
           </div>
         </Link>
         <div className="flex items-center gap-3 text-base leading-5">
-          <div className="hidden sm:block">
+          <div className="hidden lg:block">
             {HEADER_NAV_LINKS.filter((link) => link.href !== '/').map((link) => (
               <Link
                 key={link.title}

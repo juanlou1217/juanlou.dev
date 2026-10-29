@@ -17,6 +17,7 @@
 - `/blog/essay` 随笔记录流
 - `/tags` 与 `/tags/[tag]`
 - `/about`
+- `/music`：Folia 固定合集播放器，仅允许合集读取、播放检查与音频流
 - `/lab` 轻量 Skills 资产展示
 
 当前明确不应被 agent 擅自恢复或扩展为完整功能的区域：
@@ -158,3 +159,5 @@
 - FreeLLMAPI 或其他应用的域名路由
 
 新增或修改生产域名时，应修改 Infra 仓库；博客容器继续通过共享的 `juanlou-dev_default` 网络供统一入口访问。
+
+音乐适配服务、加密凭据及跨应用网络归 `juanlou-infra/music` 管理。博客只连接内部适配层，不能透传用户指定的 Folia 路径、合集 ID、Cookie、Token 或音源 URL。

@@ -31,39 +31,21 @@ install_package() {
 
 compose_up() {
   if docker compose version >/dev/null 2>&1; then
-    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans
-    return
+    COMPOSE=(docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE")
+  elif command -v docker-compose >/dev/null 2>&1; then
+    COMPOSE=(docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE")
+  elif command -v podman-compose >/dev/null 2>&1; then
+    COMPOSE=(podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE")
+  else
+    echo "Docker Compose is not available" >&2
+    exit 1
   fi
 
-  if command -v docker-compose >/dev/null 2>&1; then
-    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans
-    return
+  # Bootstrap only when PostgreSQL does not exist; normal releases leave it alone.
+  if [ -z "$("${COMPOSE[@]}" ps -q postgres)" ]; then
+    "${COMPOSE[@]}" up -d postgres
   fi
-
-  if command -v podman-compose >/dev/null 2>&1; then
-    podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d
-    return
-  fi
-
-  echo "Docker Compose is not available" >&2
-  exit 1
-}
-
-compose_down() {
-  if docker compose version >/dev/null 2>&1; then
-    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down --remove-orphans || true
-    return
-  fi
-
-  if command -v docker-compose >/dev/null 2>&1; then
-    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down --remove-orphans || true
-    return
-  fi
-
-  if command -v podman-compose >/dev/null 2>&1; then
-    podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down || true
-    return
-  fi
+  "${COMPOSE[@]}" up -d --no-deps --force-recreate app
 }
 
 ensure_container_runtime() {
@@ -151,5 +133,4 @@ if [ -n "$APP_IMAGE_ARCHIVE" ] && [ -f "$APP_IMAGE_ARCHIVE" ]; then
   fi
 fi
 
-compose_down
 compose_up

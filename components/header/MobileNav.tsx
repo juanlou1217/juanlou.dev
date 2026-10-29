@@ -33,7 +33,7 @@ const MobileNav = () => {
 
   return (
     <>
-      <button data-umami-event="mobile-nav-toggle" aria-label="Toggle Menu" onClick={onToggleNav} className="sm:hidden">
+      <button data-umami-event="mobile-nav-toggle" aria-label="Toggle Menu" onClick={onToggleNav} className="lg:hidden">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"

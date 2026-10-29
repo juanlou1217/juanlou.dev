@@ -4,6 +4,7 @@ export const HEADER_NAV_LINKS = [
   { href: '/blog/life', title: '生活感悟' },
   { href: '/blog/essay', title: '随笔' },
   { href: '/lab', title: '实验室' },
+  { href: '/music', title: '音乐' },
   { href: '/about', title: '关于' },
 ];
 

@@ -60,6 +60,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     createEntry(BLOG_CATEGORY_DETAILS.life.path, lifeBlogs),
     createEntry(BLOG_CATEGORY_DETAILS.essay.path, essayBlogs),
     createEntry('/lab'),
+    createEntry('/music'),
     createEntry('/tags', publishedBlogs),
   ];
 

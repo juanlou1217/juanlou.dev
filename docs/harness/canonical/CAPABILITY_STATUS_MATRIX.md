@@ -35,6 +35,7 @@
 | Projects 页           | `DISABLED` | 当前返回 404                           | `/projects`                  |
 | 邮件 newsletter       | `DISABLED` | 当前未启用，仅显式返回未启用状态       | `/api/newsletter`            |
 | 国际化                | `DISABLED` | 当前仅保留文档，不进入实现             | 文档层                       |
+| 固定音乐合集          | `OPEN`     | Folia QQ 普通个人合集；匿名访客播放，服务端校验成员与隔离凭据 | `/music` `/api/music/*` |
 | Spotify / now playing | `DISABLED` | 历史能力，当前不恢复                   | 无                           |
 | sitemap / robots      | `INTERNAL` | 对搜索引擎和站点发现性提供支撑         | `/sitemap.xml` `/robots.txt` |
 | Contentlayer 构建链路 | `INTERNAL` | 内容解析与索引生成                     | 构建过程                     |

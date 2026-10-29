@@ -1,76 +1,160 @@
-name: Prepare Music Integration
+name: Deploy Production
+
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      operation:
-        type: choice
-        options: [setup, login, verify]
-        default: verify
-permissions:
-  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
 jobs:
-  inspect:
+  deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    env:
+      DEPLOY_HOST: ${{ secrets.PROD_HOST }}
+      DEPLOY_USER: ${{ secrets.PROD_USER }}
+      DEPLOY_PATH: ${{ secrets.PROD_PATH }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+      APP_IMAGE: localhost/juanlou-dev_app:latest
+      APP_IMAGE_ARCHIVE: app-image.tar.gz
+      GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
+      NEXT_PUBLIC_GISCUS_REPO: ${{ secrets.NEXT_PUBLIC_GISCUS_REPO }}
+      NEXT_PUBLIC_GISCUS_REPOSITORY_ID: ${{ secrets.NEXT_PUBLIC_GISCUS_REPOSITORY_ID }}
+      NEXT_PUBLIC_GISCUS_CATEGORY: ${{ secrets.NEXT_PUBLIC_GISCUS_CATEGORY }}
+      NEXT_PUBLIC_GISCUS_CATEGORY_ID: ${{ secrets.NEXT_PUBLIC_GISCUS_CATEGORY_ID }}
+      UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
+      UMAMI_SHARE_URL: ${{ secrets.UMAMI_SHARE_URL }}
     steps:
-      - name: Inspect production without changing services
-        env:
-          PROD_HOST: ${{ secrets.PROD_HOST }}
-          PROD_USER: ${{ secrets.PROD_USER }}
-          PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
-          MUSIC_BUNDLE: ${{ secrets.MUSIC_INFRA_BUNDLE }}
-          OPERATION: ${{ inputs.operation }}
+      - uses: actions/checkout@v4
+
+      - name: Validate required secrets
         run: |
-          umask 077
+          test -n "$DEPLOY_HOST" || (echo "Missing PROD_HOST secret" && exit 1)
+          test -n "$DEPLOY_USER" || (echo "Missing PROD_USER secret" && exit 1)
+          test -n "${{ secrets.PROD_SSH_KEY }}" || (echo "Missing PROD_SSH_KEY secret" && exit 1)
+
+      - name: Configure SSH
+        run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_KEY" > ~/.ssh/id_ed25519
-          ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts
-          if [ "$OPERATION" = setup ]; then
-            printf '%s' "$MUSIC_BUNDLE" | base64 -d > music.tar.gz
-            scp music.tar.gz "$PROD_USER@$PROD_HOST:/tmp/music-infra.tar.gz"
-            ssh "$PROD_USER@$PROD_HOST" 'bash -s' <<'REMOTE'
-          set -euo pipefail
-          umask 077
-          backup=/opt/backups/music-integration-$(date -u +%Y%m%dT%H%M%SZ)
-          mkdir -p "$backup"
-          tar -czf "$backup/infra-config.tar.gz" -C /opt juanlou-infra
-          cp /opt/juanlou-dev/.env.production "$backup/blog.env.production"
-          cp /opt/juanlou-dev/docker-compose.prod.yml "$backup/blog-compose.yml"
-          podman inspect juanlou-dev_app_1 --format '{{.Image}}' > "$backup/blog-image-id"
-          podman tag "$(cat "$backup/blog-image-id")" localhost/juanlou-blog:before-music
-          tar -xzf /tmp/music-infra.tar.gz -C /opt/juanlou-infra
-          rm /tmp/music-infra.tar.gz
-          bash /opt/juanlou-infra/music/deploy.sh
-          echo "BACKUP=$backup"
-          REMOTE
-          elif [ "$OPERATION" = login ]; then
-            ssh "$PROD_USER@$PROD_HOST" 'bash -s' <<'REMOTE'
-          set -euo pipefail
-          install -d -m 700 -o 10001 -g 10001 /opt/juanlou-infra-secrets/music-handoff
-          podman rm -f blog-music-login >/dev/null 2>&1 || true
-          podman run -d --name blog-music-login --network folia_internal --user 10001:10001 --read-only --cap-drop ALL --security-opt no-new-privileges --memory 192m \
-            -v /opt/juanlou-infra/music:/music:ro -v /opt/juanlou-infra-secrets/music:/secrets \
-            -v /opt/juanlou-infra-secrets/music-handoff:/handoff \
-            --entrypoint node localhost/folia-qq-api:005c56620e07 /music/login.mjs >/dev/null
-          for i in $(seq 1 30); do
-            test ! -f /opt/juanlou-infra-secrets/music-handoff/qr.png || exit 0
-            sleep 1
-          done
-          podman logs blog-music-login
-          exit 1
-          REMOTE
-            scp "$PROD_USER@$PROD_HOST:/opt/juanlou-infra-secrets/music-handoff/qr.png" qr.png
-          else
-            ssh "$PROD_USER@$PROD_HOST" 'bash -s' <<'REMOTE'
-          set -euo pipefail
-          podman logs blog-music-login 2>/dev/null || true
-          podman exec blog-music node -e 'fetch("http://127.0.0.1:3100/collection").then(async r=>{console.log("COLLECTION_STATUS",r.status);const d=await r.json();console.log(JSON.stringify(d));})'
-          podman ps --format '{{.Names}} {{.Status}}'
-          REMOTE
-          fi
-      - uses: actions/upload-artifact@v4
-        if: inputs.operation == 'login'
+          printf '%s\n' "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config <<EOF
+          Host *
+            BatchMode yes
+            ConnectTimeout 15
+            ServerAliveInterval 15
+            ServerAliveCountMax 4
+          EOF
+
+      - name: Build production image
+        run: |
+          docker build -t "$APP_IMAGE" .
+          docker save "$APP_IMAGE" | gzip -1 > "$APP_IMAGE_ARCHIVE"
+          ls -lh "$APP_IMAGE_ARCHIVE"
+          sha256sum "$APP_IMAGE_ARCHIVE" > "$APP_IMAGE_ARCHIVE.sha256"
+
+      - name: Store production image
+        id: image-artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: music-admin-qr
-          path: qr.png
+          name: production-image
+          path: app-image.tar.gz
+          compression-level: 0
           retention-days: 1
+          if-no-files-found: error
+
+      - name: Deploy to server
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.image-artifact.outputs.artifact-id }}
+        run: |
+          DEPLOY_PATH="${DEPLOY_PATH:-/opt/juanlou-dev}"
+          POSTGRES_USER="${POSTGRES_USER:-postgres}"
+          POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
+          POSTGRES_DB="${POSTGRES_DB:-juanlou_blog}"
+          POSTGRES_URL="${POSTGRES_URL:-postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB}"
+
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            export DEBIAN_FRONTEND=noninteractive
+            if ! command -v git >/dev/null 2>&1; then
+              if command -v apt-get >/dev/null 2>&1; then
+                apt-get update && apt-get install -y git
+              elif command -v dnf >/dev/null 2>&1; then
+                dnf install -y git
+              else
+                yum install -y git
+              fi
+            fi
+            mkdir -p '$DEPLOY_PATH'
+            if [ ! -d '$DEPLOY_PATH/.git' ]; then
+              git clone --depth 1 'https://github.com/${{ github.repository }}.git' '$DEPLOY_PATH'
+            fi
+            cd '$DEPLOY_PATH'
+            git fetch origin main
+            git checkout main
+            git reset --hard '${{ github.sha }}'
+          "
+
+          artifact_metadata=$(curl --fail --silent --show-error \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID")
+          artifact_size=$(jq -r '.size_in_bytes' <<< "$artifact_metadata")
+          artifact_digest=$(jq -r '.digest | sub("^sha256:"; "")' <<< "$artifact_metadata")
+          artifact_url=$(curl --fail --silent --show-error --output /dev/null --write-out '%{redirect_url}' \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip")
+          test -n "$artifact_url"
+          echo "::add-mask::$artifact_url"
+          echo 'Downloading and verifying the image using parallel HTTPS ranges'
+          printf '%s\n' "$artifact_url" | ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            cd '$DEPLOY_PATH'
+            timeout 480 python3 scripts/deploy/download-artifact.py '$artifact_size' '$artifact_digest' image-artifact.zip.part
+            python3 -c \"import zipfile; zipfile.ZipFile('image-artifact.zip.part').extract('$APP_IMAGE_ARCHIVE', '.')\"
+            rm image-artifact.zip.part
+          "
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            cd '$DEPLOY_PATH'
+            sha256sum -c -
+          " < "$APP_IMAGE_ARCHIVE.sha256"
+          echo 'Image download and checksum verification completed'
+
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "cat > '$DEPLOY_PATH/.env.production'" <<EOF
+          POSTGRES_USER=$POSTGRES_USER
+          POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+          POSTGRES_DB=$POSTGRES_DB
+          POSTGRES_URL=$POSTGRES_URL
+          APP_IMAGE=$APP_IMAGE
+          APP_IMAGE_ARCHIVE=$DEPLOY_PATH/$APP_IMAGE_ARCHIVE
+          GITHUB_API_TOKEN=$GITHUB_API_TOKEN
+          NEXT_PUBLIC_GISCUS_REPO=$NEXT_PUBLIC_GISCUS_REPO
+          NEXT_PUBLIC_GISCUS_REPOSITORY_ID=$NEXT_PUBLIC_GISCUS_REPOSITORY_ID
+          NEXT_PUBLIC_GISCUS_CATEGORY=$NEXT_PUBLIC_GISCUS_CATEGORY
+          NEXT_PUBLIC_GISCUS_CATEGORY_ID=$NEXT_PUBLIC_GISCUS_CATEGORY_ID
+          UMAMI_WEBSITE_ID=$UMAMI_WEBSITE_ID
+          UMAMI_SHARE_URL=$UMAMI_SHARE_URL
+          EOF
+
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            export APP_DIR='$DEPLOY_PATH'
+            cd '$DEPLOY_PATH'
+            bash scripts/deploy/remote-bootstrap.sh
+          "
+
+      - name: Verify public site
+        run: |
+          curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors --max-time 20 https://juanlou.top/ -o /dev/null

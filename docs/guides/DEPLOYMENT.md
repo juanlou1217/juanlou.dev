@@ -124,3 +124,7 @@ Caddy 与域名路由的修改和日志检查统一在 `juanlou-infra` 中进行
 ### 评论区空白
 
 这是预期行为之一。未配置完整 Giscus 时，评论区会自动关闭。
+
+## 固定合集音乐服务
+
+`/music` 依赖 Infra 仓库内的独立 `blog-music` 适配层；音乐凭据仅由该服务管理。配置与运维见 [MUSIC.md](./MUSIC.md) 和私有 `juanlou-infra/music/README.md`。博客更新仅重新创建 app 容器；已有 PostgreSQL 不停止，也不删除共享网络或其他应用容器。

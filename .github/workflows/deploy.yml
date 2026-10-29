@@ -20,11 +20,6 @@ jobs:
           ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts
           ssh -o BatchMode=yes -o ConnectTimeout=15 "$PROD_USER@$PROD_HOST" 'bash -s' <<'REMOTE'
           set -eu
-          if command -v podman >/dev/null; then runtime=podman; else runtime=docker; fi
-          "$runtime" ps --format '{{.Names}} {{.Image}} {{.Status}}'
-          "$runtime" network ls --format '{{.Name}}'
-          for id in $("$runtime" ps -q); do
-            "$runtime" inspect "$id" --format '{{.Name}} networks={{range $name, $value := .NetworkSettings.Networks}}{{$name}} {{end}} mounts={{range .Mounts}}{{.Source}}:{{.Destination}} {{end}}'
-          done
-          test ! -d /opt/juanlou-infra || git -C /opt/juanlou-infra status --short
+          podman exec folia_qq-api_1 node -e 'const fs=require("fs");const p="/app/node_modules/@yakult-green-tea/qq-music-api";console.log("PACKAGE",require(p+"/package.json").version);for(const k of ["QQ_AUTH_SESSION_PATH","QQ_AUTH_STATE_PATH","QQ_SESSION_SECRET"]) console.log(k,k.endsWith("SECRET")?Boolean(process.env[k]):process.env[k]);console.log("STATE_FILES",fs.readdirSync("/app/.auth-state"));'
+          podman exec folia_qq-api_1 sh -c 'find /app/node_modules/@yakult-green-tea/qq-music-api/dist -type f | grep -E "session|Session|repository|Repository|playlist" | head -45'
           REMOTE
